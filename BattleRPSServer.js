@@ -8,6 +8,8 @@ var http = require('http');
 var port = 1339;
 
 var RPSGame = require('./RPSGame.js');
+var RPSProtocol = require('./RPSProtocol.js');
+var pIDs = RPSProtocol.protocol;
 
 var clients = [];
 
@@ -32,10 +34,28 @@ wsServer.on('request', function(request)
 {
 	
 	var socket = request.accept(null, request.origin);
+
+	var client =
+	{
+		active :false,
+
+	};
 	
 	socket.on('message', function(message)
 	{
-		
+		if (message.type === 'utf8')
+		{
+			var data = JSON.parse(message.utf8Data);
+			//check length
+			var id = data[0];
+			if (!client.active)
+			{
+				if (id == pIDs.INIT_JOIN)
+				{
+
+				}
+			}
+		}
 	});
 	
 });
