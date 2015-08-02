@@ -11,6 +11,9 @@ var RPSGame = require('./RPSGame.js');
 var RPSProtocol = require('./RPSProtocol.js');
 var pIDs = RPSProtocol.protocol;
 
+var maxPlayers = 2;
+var freeIDs = [];
+
 var clients = [];
 
 
@@ -38,7 +41,7 @@ wsServer.on('request', function(request)
 	var client =
 	{
 		active :false,
-
+		name: null
 	};
 	
 	socket.on('message', function(message)
@@ -52,8 +55,12 @@ wsServer.on('request', function(request)
 			{
 				if (id == pIDs.INIT_JOIN)
 				{
-
+					client.active = true;
+					client.name = data[1];
+					
 				}
+				
+				
 			}
 		}
 	});

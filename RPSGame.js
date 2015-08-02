@@ -11,6 +11,8 @@ exports.STARTING = 1;
 exports.WAIT_PHASE = 2;
 exports.SHOW_PHASE = 3;
 
+exports.PLAYER = 0;
+exports.SPECTATOR = 1;
 
 
 exports.GameManager = function()
