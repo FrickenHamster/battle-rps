@@ -12,6 +12,7 @@ var RPSProtocol = require('./RPSProtocol.js');
 var pIDs = RPSProtocol.protocol;
 
 var maxPlayers = 2;
+var maxClients = 10;
 var freeIDs = [];
 
 var clients = [];
@@ -21,6 +22,15 @@ var server = http.createServer(function (request, response)
 {
 	// Not important for us. We're writing WebSocket server, not HTTP server
 });
+
+function startServer()
+{
+	for (var i = maxClients - 1; i >= 0; i--)
+	{
+		freeIDs.push(i);
+	}
+}
+
 server.listen(port, function ()
 {
 	serverLog("Server started listening on port " + port);
@@ -55,17 +65,45 @@ wsServer.on('request', function(request)
 			{
 				if (id == pIDs.INIT_JOIN)
 				{
+					if (freeIDs.empty())
+					{
+						//reject
+					}
+					var clientID = freeIDs.pop(); 
 					client.active = true;
 					client.name = data[1];
+					client.id = data[clientID];
+					game.addPlayer(clientID, client)
+					clients[client.id] = 
+					for (var i = 0; i < clients.length; i++)
+					{
+						var sendClient = clients[i];
+						if (sendClient && i != id)
+						{
+							sendNewClient(sendClient, client.id, client.name);
+						}
+					}
 					
 				}
-				
 				
 			}
 		}
 	});
 	
 });
+
+function sendAssignID(sendClient, id)
+{
+	var data = [pIDs.ASSIGN_ID, id];
+	client.connection.send(JSON.stringify(data));
+}
+
+function sendNewClient(sendClient, id, name)
+{
+	var data = [pIDs.NEW_USER, id, name]
+	client.connection.send(JSON.stringify(data));
+}
+
 
 function serverLog(str1)
 {

@@ -21,23 +21,30 @@ exports.GameManager = function()
 	var maxPlayers = 2;
 	
 	var game = {
-		players:[],
+		players:{},
 		playerNum:0,
 		
 		turnTimer:0,
 		state: exports.WAITING_CONNECT,
 		stateTimer: 0,
 	};
-	game.addPlayer = function(id, name)
+	game.addPlayer = function(id, client)
 	{
-		var player = {id:id, 
-			name:name,
+		var player = {
+			id:id,
+			client:client, 
 			cards:[],
 			choice:null
 		};
 		game.players[id] = player;
 		
 		return (game.playerNum == maxPlayers);
+	};
+	
+	game.removePlayer = function(id)
+	{
+		var player = game.players[id]
+		delete game.players[id];
 	};
 	
 	
