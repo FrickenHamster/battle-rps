@@ -1,0 +1,10 @@
+
+Server start (init info)
+
+Listen for clients (clients maybe already determined) up until 2
+
+	client connected
+	Wait for login info
+		Receive info:
+		verify data
+
