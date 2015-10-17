@@ -11,3 +11,6 @@ Listen for clients (clients maybe already determined) up until 2
 		add gameserver user
 		send client info
 		Alert all clients new client
+		
+Receive Chat Message
+	Send to all clients

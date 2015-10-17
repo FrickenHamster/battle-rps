@@ -15,7 +15,7 @@ var maxPlayers = 2;
 var maxClients = 10;
 var freeIDs = [];
 
-var clients = [];
+var clients = {};
 
 
 var server = http.createServer(function (request, response)
@@ -72,9 +72,10 @@ wsServer.on('request', function(request)
 					var clientID = freeIDs.pop(); 
 					client.active = true;
 					client.name = data[1];
-					client.id = data[clientID];
-					game.addPlayer(clientID, client)
-					clients[client.id] = 
+					client.id = clientID;
+					game.addPlayer(clientID, client);
+					clients[client.id] = client;
+					sendAssignID(client, client.id);
 					for (var i = 0; i < clients.length; i++)
 					{
 						var sendClient = clients[i];
@@ -84,6 +85,16 @@ wsServer.on('request', function(request)
 						}
 					}
 					
+				}
+				
+			}
+			else
+			{
+				switch (id)
+				{
+					case pIDs.CHAT_MESSAGE:
+						
+						break;
 				}
 				
 			}

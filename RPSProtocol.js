@@ -6,7 +6,8 @@
 exports.protocol = {
 	INIT_JOIN: 1,
 	ASSIGN_ID: 2,
-	NEW_USER:3
+	NEW_USER:3,
+	CHAT_MESSAGE:10
 };
 
 
