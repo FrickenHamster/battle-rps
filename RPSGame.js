@@ -15,59 +15,59 @@ exports.PLAYER = 0;
 exports.SPECTATOR = 1;
 
 
-exports.GameManager = function()
+
+
+var maxPlayers = 2;
+
+var Game = function(){
+	
+	this.players ={};
+	this.playerNum = 0;
+	
+	this.turnTimer = 0;
+	this.state = exports.WAITING_CONNECT;
+	this.stateTimer = 0;
+};
+Game.prototype.addPlayer = function(id, client)
 {
-	
-	var maxPlayers = 2;
-	
-	var game = {
-		players:{},
-		playerNum:0,
-		
-		turnTimer:0,
-		state: exports.WAITING_CONNECT,
-		stateTimer: 0,
+	var player = {
+		id:id,
+		client:client, 
+		cards:[],
+		choice:null
 	};
-	game.addPlayer = function(id, client)
-	{
-		var player = {
-			id:id,
-			client:client, 
-			cards:[],
-			choice:null
-		};
-		game.players[id] = player;
-		
-		return (game.playerNum == maxPlayers);
-	};
+	this.players[id] = player;
 	
-	game.removePlayer = function(id)
-	{
-		var player = game.players[id]
-		delete game.players[id];
-	};
-	
-	
-	
-	game.startGame = function()
-	{
-		game.state = exports.WAIT_PHASE;
-	};
-	
-	game.update = function()
-	{
-		switch (game.state)
-		{
-			case exports.STARTING:
-				
-				break;
-		}
-	};
-	
-	return game;
+	return (this.playerNum == maxPlayers);
+};
+
+Game.prototype.removePlayer = function(id)
+{
+	var player = this.players[id]
+	delete this.players[id];
 };
 
 
+
+Game.prototype.startGame = function()
+{
+	this.state = exports.WAIT_PHASE;
+};
+
+Game.prototype.update = function()
+{
+	switch (this.state)
+	{
+		case exports.STARTING:
+			
+			break;
+	}
+};
+	
+
+
+
+exports.GameManager = Game;
 
 
 

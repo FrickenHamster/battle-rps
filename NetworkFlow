@@ -1,4 +1,11 @@
 
+INIT_JOIN: 1,
+ASSIGN_ID: 2,
+NEW_USER:3,
+SEND_USERS:4, array of users
+CHAT_MESSAGE:10 senderID message
+
+
 Server start (init info)
 
 Listen for clients (clients maybe already determined) up until 2
