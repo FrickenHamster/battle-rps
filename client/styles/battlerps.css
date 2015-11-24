@@ -1,0 +1,51 @@
+
+.rps-container
+{
+    display:flex;
+	flex-direction: column;
+    justify-content: center;
+	align-items: center;
+}
+
+.chat-container
+{
+}
+
+.chat
+{
+    border: 1px solid #000;
+    width: 600px;
+}
+
+.chat-ticker
+{
+
+	background:#eeeeee;
+	display: flex;
+	flex-direction: column-reverse;
+	height: 100px;
+	overflow-y: scroll;
+	width: 100%;
+	
+	
+}
+
+.chat-input
+{
+	width: 100%;
+}
+
+.chat-message
+{
+	color: black;
+}
+
+.system-message
+{
+	color: #28a4c9;
+}
+
+.chat-error
+{
+	color: red;
+}

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+
+	<link rel="stylesheet" href="styles/normalize.css">
+</head>
+<body>
+
+<div class="js-insert" style="padding-top: 150px"></div>
+
+<script src="js/public/libs/jquery.js"></script>
+<script src="js/public/libs/pixi.js"></script>
+<script src="js/public/battlerps/BattleRPSClient.js"></script>
+<script src="js/public/battlerps/BattleRPSProtocol.js"></script>
+<script src="js/public/battlerps/BattleRPSGame.js"></script>
+<script src="js/public/battlerps/BattleRPSSys.js"></script>
+<script src="js/public/battlerps/BattleRPSHud.js"></script>
+
+<script src="js/public/battlerps/TableCard.js"></script>
+<script>
+"use strict";
+
+$(document).ready(function ()
+{
+	$('.js-insert').load('battle_rps.html', function()
+	{
+		init()
+		
+	});
+	
+});</script>
+</body>
+</html>

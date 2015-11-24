@@ -1,0 +1,18 @@
+
+
+Start client(login info already known)
+
+Open connection to server
+On Success
+	Sent login info (JOIN)
+	
+		receive success
+		save client info
+		Receive ID
+			Connection complete
+		
+
+Send Chat Message
+
+Receive Chat Message
+	Add in Chat Box
