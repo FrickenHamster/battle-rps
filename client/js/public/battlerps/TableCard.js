@@ -4,57 +4,162 @@
 
 
 
-function TableCard(container)
+function TableCard(game, container)
 {
+	this.game = game;
 	this.container = container;
 	this.sprite = new PIXI.Sprite();
 	this.sprite.anchor.x = .5;
 	this.sprite.anchor.y = .5;
-	this.sprite.scale.x = .5;
-	this.sprite.scale.y = .5;
+	this.alive = false;
 }
 
 TableCard.prototype = new HamClickable();
 
 
-TableCard.prototype.spawn = function(spriteName, x, y)
+TableCard.prototype.spawn = function(cardValue, x, y)
 {
-	this.sprite.texture = PIXI.loader.resources[spriteName].texture;
+	this.cardValue = cardValue;
+	this.alive = true;
+	this.sprite.texture = PIXI.loader.resources[BattleRPSTextures.textureNames[cardValue]].texture;
 	this.x = x;
 	this.y = y;
+	this.sprite.anchor.x = .5;
+	this.sprite.anchor.y = .5;
 	this.sprite.position.x = x;
 	this.sprite.position.y = y;
+	this.sprite.tint = 0xffffff;
 	this.container.addChild(this.sprite);
-	this.initClickable(x - 35, y - 60, 70, 121);
+	this.initClickable(x - 20, y - 35, 40, 70);
 	
 	this.dragging = false;
+	this.selected = false;
 };
 
 TableCard.prototype.update = function(mouseX, mouseY)
 {
 	if (this.dragging == true)
 	{
-		this.x = mouseX;
-		this.y = mouseY;
-		this.clickX = this.x - 35;
-		this.clickY = this.y - 60;
+		var dx = mouseX - this.dragXOff;
+		var dy = mouseY - this.dragYOff;
+		this.x = dx;
+		this.y = dy;
+		this.x = Math.min(Math.max(this.x, 20), this.game.width - 20);
+		this.y = Math.min(Math.max(this.y, 285), this.game.height - 35);
+		this.updateClickPosition(this.x - 20, this.y - 35);
 		this.sprite.position.x = this.x;
 		this.sprite.position.y = this.y;
+		if (Math.abs(this.x - this.game.deckX) < 20 && Math.abs(this.y - this.game.deckY) < 30)
+		{
+			this.sprite.tint = 0xff8888;
+		}
+		else if (this.game.selected == undefined)
+		{
+			if (Math.abs(this.x - this.game.platformX) < 40 && Math.abs(this.y - this.game.platformY) < 50)
+			{
+				this.sprite.tint = 0x88FF88;
+			}
+			else
+			{
+				this.sprite.tint = 0xffffff;
+			}
+		}
+		else
+		{
+			if (Math.abs(this.x - this.game.platformX) < 80 && Math.abs(this.y - this.game.platformY) < 100)
+			{
+				this.sprite.tint = 0xFF8888;
+			}
+			else
+			{
+				this.sprite.tint = 0xffffff;
+			}
+		}
+		
 	}
 };
 
+TableCard.prototype.completeDrag = function()
+{
+	if (Math.abs(this.x - this.game.deckX) < 20 && Math.abs(this.y - this.game.deckY) < 30)
+	{
+		this.backToDeck();
+	}
+	else 
+	{
+		this.dragging = false;
+		if (Math.abs(this.x - this.game.platformX) < 40 && Math.abs(this.y - this.game.platformY) < 50)
+		{
+			if (this.game.selectedCard == undefined)
+			{
+				this.x = this.game.platformX;
+				this.y = this.game.platformY;
 
+				this.game.selectCard(this);
+				this.selected = true;
+			}
+			else
+			{
+				if (Math.abs(this.y - this.game.platformY) < 30)
+				{
+					if (this.x > this.game.platformX)
+					{
+						this.x = this.game.platformX + 60;
+					}
+					else
+					{
+						this.x = this.game.platformX - 60;
+					}
+				}
+				else
+				{
+					if (this.y > this.game.platformY)
+					{
+						this.y = this.game.platformY + 80;
+					}
+					else
+					{
+						this.y = this.game.platformY - 80;
+					}
+				}
+			}
+			this.x = Math.min(Math.max(this.x, 20), this.game.width - 20);
+			this.y = Math.min(Math.max(this.y, 285), this.game.height - 35);
+			this.updateClickPosition(this.x - 20, this.y - 35);
+			this.sprite.position.x = this.x;
+			this.sprite.position.y = this.y;
+		}
+	}
+};
 
 TableCard.prototype.onClick = function(mouseX, mouseY)
 {
 	this.dragging = true;
 	this.dragXOff = mouseX - this.x;
 	this.dragYOff = mouseY - this.y;
-	
+	this.game.draggingCard = this;
+	this.game.tableCards.splice(this.game.tableCards.indexOf(this), 1);
+	this.game.tableCards.unshift(this);
+	this.container.removeChild(this.sprite);
+	this.container.addChild(this.sprite);
+	if (this.selected)
+	{
+		this.selected = false;
+		this.game.unselectCard();
+	}
 };
 
+TableCard.prototype.backToDeck = function()
+{
+	this.die();
+};
 
-
+TableCard.prototype.die = function()
+{
+	this.game.tableCards.splice(this.game.tableCards.indexOf(this), 1);
+	this.alive = false;
+	this.container.removeChild(this.sprite);
+};
 	
 	
 

@@ -9,6 +9,8 @@ var BattleRPSTextures =
 };
 BattleRPSTextures.textureNames = {};
 BattleRPSTextures.textureNames[0] = 'rockCard';
+BattleRPSTextures.textureNames[1] = 'paperCard';
+BattleRPSTextures.textureNames[2] = 'scissorsCard';
 
 function BattleRPSGame(client)
 {
@@ -17,7 +19,7 @@ function BattleRPSGame(client)
 	this.gameMouseX = 0;
 	this.gameMouseY = 0;
 	this.stage = new PIXI.Container();
-	this.stage.hitArea = new PIXI.Rectangle(0, 0, this.width, this.height);
+	this.stage.hitArea = new PIXI.Rectangle(0, 0, this.width, 500);
 	this.renderer = PIXI.autoDetectRenderer(this.width, this.height);
 	this.renderer.backgroundColor = 0x98FF98;
 	
@@ -68,10 +70,17 @@ BattleRPSGame.prototype.startMatch = function()
 {
 	this.stage.on('mousedown', this.mouseDown);
 	this.stage.on('mousemove', this.mouseMove);
+	this.stage.on('mouseup', this.mouseUp);
+	this.stage.on('mouseout', function(e)
+	{
+	});
+	
 	this.stage.interactive = true;
 	
 	this.tableLayer = new PIXI.Container();
 	this.stage.addChild(this.tableLayer);
+	this.platformX = 300;
+	this.platformY = 300;
 	this.playerCardPlatform = new PIXI.Sprite(PIXI.loader.resources['cardPlatform'].texture);
 	this.playerCardPlatform.anchor.x = 0.5;
 	this.playerCardPlatform.anchor.y = 0.5;
@@ -81,20 +90,23 @@ BattleRPSGame.prototype.startMatch = function()
 	this.tableCardLayer = new PIXI.Container();
 	this.stage.addChild(this.tableCardLayer);
 	
+	
+	
 	this.tableLine = new PIXI.Graphics();
 	this.tableLine.lineStyle(2, 0x000000, 1);
 	this.tableLine.moveTo(0, this.height / 2);
 	this.tableLine.lineTo(this.width, this.height / 2);
 	
 	this.tableLayer.addChild(this.tableLine);
-	
+
+	this.deckX = 300;
+	this.deckY = 440;
 	this.deckSprite = new PIXI.Sprite(PIXI.loader.resources['saltCardBack'].texture);
 	this.deckSprite.anchor.x = .5;
 	this.deckSprite.anchor.y = .5;
-	this.deckSprite.position.x = 300;
-	this.deckSprite.position.y = 420;
-	this.deckSprite.scale.x = .5;
-	this.deckSprite.scale.y = .5;
+	this.deckSprite.position.x = this.deckX;
+	this.deckSprite.position.y = this.deckY;
+	
 	this.tableLayer.addChild(this.deckSprite);
 	
 	this.tableCards = [];
@@ -105,13 +117,40 @@ BattleRPSGame.prototype.startMatch = function()
 
 BattleRPSGame.prototype.mouseDown = function(mouseData)
 {
-	game.hud.mouseDown(mouseData.data.originalEvent.offsetX, mouseData.data.originalEvent.offsetY);
+	var mx = mouseData.data.originalEvent.offsetX;
+	var my = mouseData.data.originalEvent.offsetY;
+	if (game.hud.mouseDown(mx, my))
+	{
+		return;
+	}
+	for (var i in game.tableCards)
+	{
+		var tableCard = game.tableCards[i];
+		if (tableCard.checkClick(mx, my))
+		{
+			return;
+		}
+	}
 };
 
 BattleRPSGame.prototype.mouseMove = function(mouseData)
 {
-	game.gameMouseX = mouseData.data.originalEvent.offsetX;
-	game.gameMouseY = mouseData.data.originalEvent.offsetY;
+	/*var gx = mouseData.data.global.x;
+	var gy = mouseData.data.global.y;
+	if (gx < 0 || gx > game.width || gy < 0 || gy > game.height)
+		return;
+	game.gameMouseX = gx;
+	game.gameMouseY = gy;*/
+};
+
+BattleRPSGame.prototype.mouseUp = function(mouseData)
+{
+	if (game.draggingCard != undefined)
+	{
+		game.draggingCard.completeDrag();
+		game.draggingCard = undefined;
+		
+	}
 };
 
 
@@ -124,11 +163,22 @@ BattleRPSGame.prototype.addPlayer = function (id, name)
 	this.players[id] = player;
 };
 
-BattleRPSGame.prototype.addTableCard = function(x, y)
+BattleRPSGame.prototype.addTableCard = function(type, x, y)
 {
-	var card = new TableCard(this.tableCardLayer);
-	card.spawn('paperCard', x, y);
-	this.tableCards.push(card);
+	var card = new TableCard(this, this.tableCardLayer);
+	card.spawn(type, x, y);
+	this.tableCards.unshift(card);
+};
+
+BattleRPSGame.prototype.selectCard = function(card)
+{
+	this.selectedCard = card;
+	this.client.addSystemMessage("Selected " + card.cardValue)
+};
+
+BattleRPSGame.prototype.unselectCard = function()
+{
+	this.selectedCard = undefined;
 };
 
 BattleRPSGame.prototype.selectRock = function()
@@ -138,6 +188,13 @@ BattleRPSGame.prototype.selectRock = function()
 
 BattleRPSGame.prototype.drawLoop = function()
 {
+	var gx = game.renderer.plugins.interaction.mouse.global.x;
+	var gy = game.renderer.plugins.interaction.mouse.global.y;
+	if (gx >= 0 && gx <= game.width && gy >= 0 && gy <= game.height)
+	{
+		game.gameMouseX = gx;
+		game.gameMouseY = gy;
+	}
 	for (var i in game.tableCards)
 	{
 		var tableCard = game.tableCards[i];
@@ -146,8 +203,7 @@ BattleRPSGame.prototype.drawLoop = function()
 	
 	game.renderer.render(game.stage);
 	requestAnimationFrame(game.drawLoop);
-	//game.gameMouseX = game.renderer.plugins.interaction.mouse.originalEvent.offsetX;
-	//game.gameMouseY = game.renderer.plugins.interaction.mouse.originalEvent.offsetY;
+	
 };
 
 BattleRPSGame.prototype.getView = function ()

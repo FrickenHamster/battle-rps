@@ -22,7 +22,6 @@ HamClickable.prototype.checkClick = function(mouseX, mouseY)
 	var hh = this.clickHeight * this.sprite.scale.y;
 	if (this.clickX + ww < mouseX || this.clickX > mouseX || this.clickY + hh < mouseY || this.clickY > mouseY)
 		return false;
-
 	this.onClick(mouseX, mouseY);
 	return true;
 };
@@ -32,8 +31,8 @@ HamClickable.prototype.onClick = function(mouseX, mouseY)
 	
 };
 
-HamClickable.prototype.update = function(x, y)
+HamClickable.prototype.updateClickPosition = function(x, y)
 {
 	this.clickX = x;
 	this.clickY = y;
-}
+};
