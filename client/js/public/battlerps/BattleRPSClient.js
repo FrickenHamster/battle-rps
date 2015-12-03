@@ -219,7 +219,12 @@ BattleRPSClient.prototype.sendMessage = function(message)
 	dLog("SEND", "CHAT" + message);
 };
 
-
+BattleRPSClient.prototype.sendDrawCard = function(value)
+{
+	var data = [RPS_PROTOCOL.DRAW_CARD, value];
+	this.connection.send(JSON.stringify(data));
+	dLog("SEND", "DRAW:" + value);
+};
 
 function dLog()
 {

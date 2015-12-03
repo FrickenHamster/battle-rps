@@ -19,14 +19,17 @@ exports.SPECTATOR = 1;
 
 var maxPlayers = 2;
 
-var Game = function(){
+var Game = function(server){
 	
+	this.server = server;
 	this.players ={};
 	this.playerNum = 0;
 	
 	this.turnTimer = 0;
 	this.state = exports.WAITING_CONNECT;
 	this.stateTimer = 0;
+	
+	this.tableCards = [];
 };
 Game.prototype.addPlayer = function(id, client)
 {
@@ -63,7 +66,14 @@ Game.prototype.update = function()
 			break;
 	}
 };
-	
+
+Game.prototype.drawCard = function(id, type)
+{
+	var card = new TableCard(id, type);
+	this.tableCards.push(card);
+	this.server.
+};
+
 
 
 

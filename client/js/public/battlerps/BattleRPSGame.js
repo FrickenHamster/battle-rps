@@ -12,6 +12,8 @@ BattleRPSTextures.textureNames[0] = 'rockCard';
 BattleRPSTextures.textureNames[1] = 'paperCard';
 BattleRPSTextures.textureNames[2] = 'scissorsCard';
 
+var MAX_TABLE_CARDS = 50;
+
 function BattleRPSGame(client)
 {
 	this.width = 600;
@@ -26,7 +28,6 @@ function BattleRPSGame(client)
 	this.client = client;
 	this.players = {};
 	
-
 	game = this;
 	PIXI.loader.add([
 		{
@@ -108,8 +109,24 @@ BattleRPSGame.prototype.startMatch = function()
 	this.deckSprite.position.y = this.deckY;
 	
 	this.tableLayer.addChild(this.deckSprite);
-	
+
 	this.tableCards = [];
+	this.activeTableCards = [];
+	this.tableCardPool = [];
+	for (var i = 0; i < MAX_TABLE_CARDS; i++)
+	{
+		var card = new TableCard(this, this.tableCardLayer, i);
+		this.tableCardPool.unshift(card);
+	}
+
+	this.enemyTableCards = [];
+	this.activeEnemyTableCards = [];
+	this.enemyTableCardPool = [];
+	for (i = 0; i < MAX_TABLE_CARDS; i++)
+	{
+		var card = new EnemyTableCard(this, this.tableCardLayer, i);
+		this.enemyTableCardPool.unshift(card);
+	}
 	
 	this.drawLoop();
 	
@@ -123,9 +140,9 @@ BattleRPSGame.prototype.mouseDown = function(mouseData)
 	{
 		return;
 	}
-	for (var i in game.tableCards)
+	for (var i in game.activeTableCards)
 	{
-		var tableCard = game.tableCards[i];
+		var tableCard = game.activeTableCards[i];
 		if (tableCard.checkClick(mx, my))
 		{
 			return;
@@ -163,11 +180,32 @@ BattleRPSGame.prototype.addPlayer = function (id, name)
 	this.players[id] = player;
 };
 
-BattleRPSGame.prototype.addTableCard = function(type, x, y)
+BattleRPSGame.prototype.addTableCard = function(id, type, x, y)
 {
-	var card = new TableCard(this, this.tableCardLayer);
-	card.spawn(type, x, y);
-	this.tableCards.unshift(card);
+	if (this.tableCards[id] !== undefined)
+		return undefined;
+	if (this.tableCardPool.length == 0)
+		return undefined;
+	var card = this.tableCardPool.pop();
+	card.spawn(id, type, x, y);
+	this.tableCards[id] = card;
+	this.activeTableCards.unshift(card);
+	
+	return card;
+};
+
+BattleRPSGame.prototype.addEnemyTableCard = function(id, x, y)
+{
+	if (this.enemyTableCards[id] !== undefined)
+		return undefined;
+	if (this.enemyTableCardPool.length == 0)
+		return undefined;
+	var card = this.enemyTableCardPool.pop();
+	card.spawn(id, x, y);
+	this.enemyTableCards[id] = card;
+	this.activeEnemyTableCards.unshift(card);
+
+	return card;
 };
 
 BattleRPSGame.prototype.selectCard = function(card)
@@ -186,6 +224,18 @@ BattleRPSGame.prototype.selectRock = function()
 	this.client.addSystemMessage("Selected Rock");
 };
 
+BattleRPSGame.prototype.getFreeTableCardID = function()
+{
+	for (var i = 0; i < MAX_TABLE_CARDS; i++)
+	{
+		if (this.tableCards[i] == undefined)
+		{
+			console.log(i);
+			return i;
+		}
+	}
+};
+
 BattleRPSGame.prototype.drawLoop = function()
 {
 	var gx = game.renderer.plugins.interaction.mouse.global.x;
@@ -195,9 +245,9 @@ BattleRPSGame.prototype.drawLoop = function()
 		game.gameMouseX = gx;
 		game.gameMouseY = gy;
 	}
-	for (var i in game.tableCards)
+	for (var i in game.activeTableCards)
 	{
-		var tableCard = game.tableCards[i];
+		var tableCard = game.activeTableCards[i];
 		tableCard.update(game.gameMouseX, game.gameMouseY);
 	}
 	

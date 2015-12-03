@@ -17,8 +17,9 @@ function TableCard(game, container)
 TableCard.prototype = new HamClickable();
 
 
-TableCard.prototype.spawn = function(cardValue, x, y)
+TableCard.prototype.spawn = function(id, cardValue, x, y)
 {
+	this.id = id;
 	this.cardValue = cardValue;
 	this.alive = true;
 	this.sprite.texture = PIXI.loader.resources[BattleRPSTextures.textureNames[cardValue]].texture;
@@ -53,7 +54,7 @@ TableCard.prototype.update = function(mouseX, mouseY)
 		{
 			this.sprite.tint = 0xff8888;
 		}
-		else if (this.game.selected == undefined)
+		else if (this.game.selectedCard == undefined)
 		{
 			if (Math.abs(this.x - this.game.platformX) < 40 && Math.abs(this.y - this.game.platformY) < 50)
 			{
@@ -66,7 +67,7 @@ TableCard.prototype.update = function(mouseX, mouseY)
 		}
 		else
 		{
-			if (Math.abs(this.x - this.game.platformX) < 80 && Math.abs(this.y - this.game.platformY) < 100)
+			if (Math.abs(this.x - this.game.platformX) < 60 && Math.abs(this.y - this.game.platformY) < 80)
 			{
 				this.sprite.tint = 0xFF8888;
 			}
@@ -88,9 +89,9 @@ TableCard.prototype.completeDrag = function()
 	else 
 	{
 		this.dragging = false;
-		if (Math.abs(this.x - this.game.platformX) < 40 && Math.abs(this.y - this.game.platformY) < 50)
+		if (this.game.selectedCard == undefined)
 		{
-			if (this.game.selectedCard == undefined)
+			if (Math.abs(this.x - this.game.platformX) < 40 && Math.abs(this.y - this.game.platformY) < 50)
 			{
 				this.x = this.game.platformX;
 				this.y = this.game.platformY;
@@ -98,7 +99,10 @@ TableCard.prototype.completeDrag = function()
 				this.game.selectCard(this);
 				this.selected = true;
 			}
-			else
+		}
+		else 
+		{
+			if (Math.abs(this.x - this.game.platformX) < 60 && Math.abs(this.y - this.game.platformY) < 80)
 			{
 				if (Math.abs(this.y - this.game.platformY) < 30)
 				{
@@ -123,12 +127,12 @@ TableCard.prototype.completeDrag = function()
 					}
 				}
 			}
-			this.x = Math.min(Math.max(this.x, 20), this.game.width - 20);
-			this.y = Math.min(Math.max(this.y, 285), this.game.height - 35);
-			this.updateClickPosition(this.x - 20, this.y - 35);
-			this.sprite.position.x = this.x;
-			this.sprite.position.y = this.y;
 		}
+		this.x = Math.min(Math.max(this.x, 20), this.game.width - 20);
+		this.y = Math.min(Math.max(this.y, 285), this.game.height - 35);
+		this.updateClickPosition(this.x - 20, this.y - 35);
+		this.sprite.position.x = this.x;
+		this.sprite.position.y = this.y;
 	}
 };
 
@@ -138,8 +142,8 @@ TableCard.prototype.onClick = function(mouseX, mouseY)
 	this.dragXOff = mouseX - this.x;
 	this.dragYOff = mouseY - this.y;
 	this.game.draggingCard = this;
-	this.game.tableCards.splice(this.game.tableCards.indexOf(this), 1);
-	this.game.tableCards.unshift(this);
+	this.game.activeTableCards.splice(this.game.activeTableCards.indexOf(this), 1);
+	this.game.activeTableCards.unshift(this);
 	this.container.removeChild(this.sprite);
 	this.container.addChild(this.sprite);
 	if (this.selected)
@@ -156,7 +160,7 @@ TableCard.prototype.backToDeck = function()
 
 TableCard.prototype.die = function()
 {
-	this.game.tableCards.splice(this.game.tableCards.indexOf(this), 1);
+	this.game.activeTableCards.splice(this.game.activeTableCards.indexOf(this), 1);
 	this.alive = false;
 	this.container.removeChild(this.sprite);
 };

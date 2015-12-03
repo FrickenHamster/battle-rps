@@ -9,7 +9,9 @@ exports.protocol = {
 	NEW_USER:3,
 	SEND_USERS:4,
 	USER_LEFT:9,
-	CHAT_MESSAGE:10
+	CHAT_MESSAGE:10,
+	DRAW_CARD:30,
+	
 };
 
 

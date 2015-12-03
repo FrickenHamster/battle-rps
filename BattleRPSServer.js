@@ -42,7 +42,7 @@ startServer();
 server.listen(port, function ()
 {
 	serverLog("Server started listening on port " + port);
-	new RPSGame.GameManager();
+	new RPSGame.GameManager(this);
 });
 
 var wsServer = new webSocketServer({
@@ -115,6 +115,11 @@ wsServer.on('request', function(request)
 							}
 						}
 						break;
+					
+					case pIDs.DRAW_CARD:
+					{
+						
+					}
 				}
 				
 			}
@@ -180,6 +185,21 @@ function sendUserLeft(sendClient, disconnectedClient)
 	sendClient.connection.send(JSON.stringify(data));
 	dLog("SEND", "User left to" + sendClient.id + " disconnected client : " + disconnectedClient.id);
 }
+
+function sendDrawCardToAll(sendClient, id, value)
+{
+	var data = [pIDs.DRAW_ROCK, id, value];
+	for (var i in clients)
+	{
+		var sendClient = clients[i];
+		if (sendClient.active)
+		{
+			sendClient.connection.send(JSON.stringify(data));
+			dLog("SEND", "Draw Card to " + sendClient.id + " client : " + id);
+		}
+	}
+}
+
 
 
 function serverLog(str1)
