@@ -20,6 +20,12 @@ var freeIDs = [];
 var clients = {};
 
 
+function BattleRPSServer()
+{
+	this.port = 1339;
+	
+}
+
 var game = new RPSGame.GameManager();
 
 var server = http.createServer(function (request, response)
@@ -34,9 +40,8 @@ function startServer()
 	{
 		freeIDs.push(i);
 	}
-	
-	
 }
+
 startServer();
 
 server.listen(port, function ()
@@ -227,4 +232,9 @@ function stringCleaner(str)
 {
 	return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;')
 		.replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function tester()
+{
+	console.log("uguu");
 }

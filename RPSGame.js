@@ -2,6 +2,7 @@
  * Created by Hamster on 7/11/2015.
  */
 
+var Player = require('./Player');
 
 exports.ROCK = 0;
 exports.PAPER = 0;
@@ -20,7 +21,6 @@ exports.SPECTATOR = 1;
 var maxPlayers = 2;
 
 var Game = function(server){
-	
 	this.server = server;
 	this.players ={};
 	this.playerNum = 0;
@@ -33,12 +33,14 @@ var Game = function(server){
 };
 Game.prototype.addPlayer = function(id, client)
 {
-	var player = {
+	/*var player = {
 		id:id,
 		client:client, 
 		cards:[],
+		tableCards:[],
 		choice:null
-	};
+	};*/
+	var player = new Player();
 	this.players[id] = player;
 	
 	return (this.playerNum == maxPlayers);
@@ -71,7 +73,7 @@ Game.prototype.drawCard = function(id, type)
 {
 	var card = new TableCard(id, type);
 	this.tableCards.push(card);
-	this.server.
+	sendDrawCardToAll()
 };
 
 
