@@ -16,6 +16,8 @@ function BattleRPSClient()
 	this.clients = {};
 	this.tempName = "testing";
 	this.connection;
+	
+	var bc = this;
 
 	$('.js-game-container').append(this.gameClient.getView());
 
@@ -23,7 +25,7 @@ function BattleRPSClient()
 // if browser doesn't support WebSocket, just show some notification and exit
 	if (!window.WebSocket)
 	{
-		addChatError("Your browser does not support websockets");
+		this.addChatError("Your browser does not support websockets");
 		return;
 	}
 
@@ -41,22 +43,22 @@ function BattleRPSClient()
 			 sendMessage(chatInput.val());
 			 chatInput.val("");
 			 }*/
-			var val = this.chatInput.val();
+			var val = bc.chatInput.val();
 
-			if (this.connected == false)
+			if (bc.connected == false)
 			{
 				if (val != "")
 				{
-					this.initiateConnect(val);
-					this.chatInput.val("");
+					bc.initiateConnect(val);
+					bc.chatInput.val("");
 				}
 			}
 			else
 			{
 				if (val != "")
 				{
-					this.sendMessage(val);
-					this.chatInput.val("");
+					bc.sendMessage(val);
+					bc.chatInput.val("");
 				}
 			}
 		}
@@ -72,20 +74,19 @@ BattleRPSClient.prototype.connect = function()
 	this.setupConnection();
 };
 
-BattleRPSClient.prototype.setupConnection = function()
+BattleRPSClient.prototype.setupConnection = function(connection)
 {
-	if (this.connection == undefined)
+	if (connection == undefined)
 	{
-		return;
+		return false;
 	}
-	var connection = this.connection;
 	var bc = this;
 	connection.onopen = function ()
 	{
 		bc.chatInput.val("Connecting");
 		bc.chatInput.prop("disabled", true);
 
-		bc.sendJoin(this.tempName);
+		bc.sendJoin(bc.tempName);
 
 		/*setInterval(function ()
 		 {
@@ -174,7 +175,7 @@ BattleRPSClient.prototype.setupConnection = function()
 	{
 		bc.addChatError("Connection to the server closed");
 	};
-}
+};
 
 BattleRPSClient.prototype.addSystemMessage = function(message)
 {
@@ -201,7 +202,7 @@ BattleRPSClient.prototype.initiateConnect = function(tn)
 	var conn = new WebSocket('ws://127.0.0.1:1339');
 
 	this.addSystemMessage("CONNECTING");
-	this.initSocket(conn);
+	this.setupConnection(conn);
 	this.connection = conn;
 };
 

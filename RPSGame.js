@@ -2,7 +2,7 @@
  * Created by Hamster on 7/11/2015.
  */
 
-var Player = require('./Player');
+var Player = require('./Player').Player;
 
 exports.ROCK = 0;
 exports.PAPER = 0;
@@ -16,7 +16,7 @@ exports.PLAYER = 0;
 exports.SPECTATOR = 1;
 
 
-
+console.log(Player);
 
 var maxPlayers = 2;
 

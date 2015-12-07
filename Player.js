@@ -11,3 +11,18 @@ function Player(id, client)
 	this.tableCards = [];
 }
 
+Player.prototype.addTableCard = function(x, y)
+{
+	var card = new TableCard(x, y)
+	
+	this.tableCards.unshift(card);
+};
+
+
+
+function TableCard(x, y)
+{
+	this.x = x;
+	this.y = y;
+	this.revealed = false;
+}
