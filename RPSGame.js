@@ -73,7 +73,7 @@ Game.prototype.drawCard = function(id, type)
 {
 	var card = new TableCard(id, type);
 	this.tableCards.push(card);
-	sendDrawCardToAll()
+	this.server.sendDrawCardToAll()
 };
 
 

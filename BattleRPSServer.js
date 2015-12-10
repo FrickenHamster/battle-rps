@@ -121,7 +121,7 @@ BattleRPSServer.prototype.startServer = function()
 
 						case pIDs.DRAW_CARD:
 						{
-
+							this.game.drawCard(client.id, message[1]);
 						}
 					}
 
