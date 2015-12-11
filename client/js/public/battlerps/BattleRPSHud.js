@@ -66,7 +66,8 @@ CardButton.prototype.spawn = function(x, y)
 
 CardButton.prototype.onClick = function (mouseX, mouseY)
 {
-	this.hud.game.addTableCard(this.hud.game.getFreeTableCardID(), this.cardValue, this.hud.game.deckX - 20 + 40 * Math.random(), this.hud.game.deckY - 20 + 40 * Math.random());
+	//this.hud.game.addTableCard(this.hud.game.getFreeTableCardID(), this.cardValue, this.hud.game.deckX - 20 + 40 * Math.random(), this.hud.game.deckY - 20 + 40 * Math.random());
+	this.hud.game.client.sendDrawCard(this.cardValue);
 };
 
 CardButton.prototype.die = function()

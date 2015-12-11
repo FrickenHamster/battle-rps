@@ -3,10 +3,10 @@
  */
 
 var debugging = true;
-	
+
 var webSocketServer = require('websocket').server;
 var http = require('http');
-	
+
 var port = 1339;
 
 var RPSGame = require('./RPSGame.js');
@@ -26,14 +26,14 @@ function BattleRPSServer()
 	this.maxPlayers = 2;
 	this.maxClients = 10;
 	this.freeIDs = [];
-	
+
 	this.clients = {};
-	
+
 	this.game = new RPSGame.GameManager();
 }
 
 
-BattleRPSServer.prototype.startServer = function()
+BattleRPSServer.prototype.startServer = function ()
 {
 	var bs = this;
 	freeIDs = [];
@@ -41,31 +41,33 @@ BattleRPSServer.prototype.startServer = function()
 	{
 		freeIDs.push(i);
 	}
-	
-	this.httpServer = http.createServer(function (request, response){})
-	
-	this.httpServer.listen(this.port, function()
+
+	this.httpServer = http.createServer(function (request, response)
+	{
+	})
+
+	this.httpServer.listen(this.port, function ()
 	{
 		serverLog("Server started listening on port " + port);
 		bs.game = new RPSGame.GameManager(this);
 	});
-	
+
 	this.wsServer = new webSocketServer({
 		httpServer: this.httpServer
 	});
 
-	this.wsServer.on('request', function(request)
+	this.wsServer.on('request', function (request)
 	{
 		serverLog("connection");
 		var socket = request.accept(null, request.origin);
 
 		var client =
 		{
-			active :false,
+			active: false,
 			name: null
 		};
 
-		socket.on('message', function(message)
+		socket.on('message', function (message)
 		{
 			serverLog("receive message" + message);
 			if (message.type === 'utf8')
@@ -120,9 +122,11 @@ BattleRPSServer.prototype.startServer = function()
 							break;
 
 						case pIDs.DRAW_CARD:
-						{
-							this.game.drawCard(client.id, message[1]);
-						}
+							var xx = Math.floor(Math.random() * 600);
+							var yy = Math.floor(Math.random() * 300);
+							this.game.drawCard(client.id, message[1], xx, yy);
+								
+							break;
 					}
 
 				}
@@ -152,28 +156,28 @@ BattleRPSServer.prototype.startServer = function()
 var rpsServer = new BattleRPSServer();
 rpsServer.startServer();
 
-BattleRPSServer.prototype.sendAssignID = function(sendClient, id)
+BattleRPSServer.prototype.sendAssignID = function (sendClient, id)
 {
 	var data = [pIDs.ASSIGN_ID, id];
 	sendClient.connection.send(JSON.stringify(data));
 	dLog("SEND", "assign id : " + id);
 };
 
-BattleRPSServer.prototype.sendChatMessage = function(sendClient, fromClient, message)
+BattleRPSServer.prototype.sendChatMessage = function (sendClient, fromClient, message)
 {
 	var data = [pIDs.CHAT_MESSAGE, fromClient, message];
 	sendClient.connection.send(JSON.stringify(data));
 	dLog("send chat message to " + sendClient.id + ":" + message);
 };
 
-BattleRPSServer.prototype.sendNewClient = function(sendClient, id, name)
+BattleRPSServer.prototype.sendNewClient = function (sendClient, id, name)
 {
 	var data = [pIDs.NEW_USER, id, name];
 	sendClient.connection.send(JSON.stringify(data));
 	dLog("SEND", "New Client to " + sendClient.id + " new client : " + id);
 };
 
-BattleRPSServer.prototype.sendUsers = function(sendClient)
+BattleRPSServer.prototype.sendUsers = function (sendClient)
 {
 	var data = [pIDs.SEND_USERS];
 	for (var i in clients)
@@ -188,29 +192,39 @@ BattleRPSServer.prototype.sendUsers = function(sendClient)
 	dLog("SEND", "Users to " + sendClient.id);
 };
 
-BattleRPSServer.prototype.sendUserLeft = function(sendClient, disconnectedClient)
+BattleRPSServer.prototype.sendUserLeft = function (sendClient, disconnectedClient)
 {
 	var data = [pIDs.USER_LEFT, disconnectedClient.id];
 	sendClient.connection.send(JSON.stringify(data));
 	dLog("SEND", "User left to" + sendClient.id + " disconnected client : " + disconnectedClient.id);
 };
 
-BattleRPSServer.prototype.sendDrawCardToAll = function(sendClient, id, value)
+BattleRPSServer.prototype.sendDrawCardToAll = function (clientID, id, value, x, y)
 {
-	var data = [pIDs.DRAW_ROCK, id, value];
+	var data = [pIDs.ENEMY_DRAW_CARD, clientID, id, x, y];
 	for (var i in clients)
 	{
 		var sendClient = clients[i];
 		if (sendClient.active)
 		{
-			sendClient.connection.send(JSON.stringify(data));
-			dLog("SEND", "Draw Card to " + sendClient.id + " client : " + id);
+			if (sendClient.id == id)
+			{
+				var selfData = [pIDs.DRAW_CARD, id, value, x, y]
+				sendClient.connection.send(JSON.stringify(selfData));
+				dLog("SEND", "Self Draw Card to " + sendClient.id + " client : " + id);
+
+			}
+			else
+			{
+				sendClient.connection.send(JSON.stringify(data));
+				dLog("SEND", "Draw Card to " + sendClient.id + " client : " + id);
+			}
 		}
 	}
 };
 
 
-serverLog = function(str1)
+serverLog = function (str1)
 {
 	var date = new Date();
 	var dtext = date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();

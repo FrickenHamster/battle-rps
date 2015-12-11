@@ -30,6 +30,7 @@ var Game = function(server){
 	this.stateTimer = 0;
 	
 	this.tableCards = [];
+	this.tableCardIDCounter = 0;
 };
 Game.prototype.addPlayer = function(id, client)
 {
@@ -69,11 +70,12 @@ Game.prototype.update = function()
 	}
 };
 
-Game.prototype.drawCard = function(id, type)
+Game.prototype.drawCard = function(clientID, type, x, y)
 {
-	var card = new TableCard(id, type);
+	var card = new TableCard(clientID, this.tableCardIDCounter, type, x, y);
 	this.tableCards.push(card);
-	this.server.sendDrawCardToAll()
+	this.server.sendDrawCardToAll(clientID, card.id, card.value, card.x, card,y);
+	this.tableCardIDCounter++;
 };
 
 

@@ -167,6 +167,10 @@ BattleRPSClient.prototype.setupConnection = function(connection)
 				bc.addChatMessage(msgClient.name,  data[2]);
 
 				break;
+			
+			case RPS_PROTOCOL.DRAW_CARD:
+				this.game.addTableCard(message[0], message[1], message[2], message[3]);
+				break;
 		}
 
 	};
