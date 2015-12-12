@@ -151,7 +151,7 @@ BattleRPSClient.prototype.setupConnection = function(connection)
 						id: data[i],
 						name: data[i + 1]
 					};
-					console.log(clients[data[i]]);
+					console.log(bc.clients[data[i]]);
 				}
 				break;
 
@@ -169,7 +169,7 @@ BattleRPSClient.prototype.setupConnection = function(connection)
 				break;
 			
 			case RPS_PROTOCOL.DRAW_CARD:
-				this.game.addTableCard(message[0], message[1], message[2], message[3]);
+				bc.gameClient.addTableCard(data[1], data[2], data[3], data[4]);
 				break;
 		}
 
@@ -219,6 +219,8 @@ BattleRPSClient.prototype.sendJoin = function(userName)
 
 BattleRPSClient.prototype.sendMessage = function(message)
 {
+	if (!this.connected)
+		return;
 	var data = [RPS_PROTOCOL.CHAT_MESSAGE, message];
 	this.connection.send(JSON.stringify(data));
 	dLog("SEND", "CHAT" + message);
@@ -226,6 +228,8 @@ BattleRPSClient.prototype.sendMessage = function(message)
 
 BattleRPSClient.prototype.sendDrawCard = function(value)
 {
+	if (!this.connected)
+		return;
 	var data = [RPS_PROTOCOL.DRAW_CARD, value];
 	this.connection.send(JSON.stringify(data));
 	dLog("SEND", "DRAW:" + value);

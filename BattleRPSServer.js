@@ -29,7 +29,6 @@ function BattleRPSServer()
 
 	this.clients = {};
 
-	this.game = new RPSGame.GameManager();
 }
 
 
@@ -44,12 +43,12 @@ BattleRPSServer.prototype.startServer = function ()
 
 	this.httpServer = http.createServer(function (request, response)
 	{
-	})
+	});
 
 	this.httpServer.listen(this.port, function ()
 	{
 		serverLog("Server started listening on port " + port);
-		bs.game = new RPSGame.GameManager(this);
+		bs.game = new RPSGame.GameManager(bs);
 	});
 
 	this.wsServer = new webSocketServer({
@@ -124,7 +123,7 @@ BattleRPSServer.prototype.startServer = function ()
 						case pIDs.DRAW_CARD:
 							var xx = Math.floor(Math.random() * 600);
 							var yy = Math.floor(Math.random() * 300);
-							this.game.drawCard(client.id, message[1], xx, yy);
+							bs.game.drawCard(client.id, data[1], xx, yy);
 								
 							break;
 					}
@@ -207,17 +206,19 @@ BattleRPSServer.prototype.sendDrawCardToAll = function (clientID, id, value, x, 
 		var sendClient = clients[i];
 		if (sendClient.active)
 		{
-			if (sendClient.id == id)
+			if (sendClient.id == clientID)
 			{
-				var selfData = [pIDs.DRAW_CARD, id, value, x, y]
+				var selfData = [pIDs.DRAW_CARD, id, value, x, y];
+				console.log(selfData)
+
 				sendClient.connection.send(JSON.stringify(selfData));
-				dLog("SEND", "Self Draw Card to " + sendClient.id + " client : " + id);
+				dLog("SEND", "Self Draw Card to " + sendClient.id + " id: " + id);
 
 			}
 			else
 			{
 				sendClient.connection.send(JSON.stringify(data));
-				dLog("SEND", "Draw Card to " + sendClient.id + " client : " + id);
+				dLog("SEND", "Draw Card to " + sendClient.id + " from : " + clientID);
 			}
 		}
 	}

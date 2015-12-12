@@ -3,6 +3,7 @@
  */
 
 var Player = require('./Player').Player;
+var TableCard = require('./TableCard').TableCard;
 
 exports.ROCK = 0;
 exports.PAPER = 0;
@@ -16,7 +17,6 @@ exports.PLAYER = 0;
 exports.SPECTATOR = 1;
 
 
-console.log(Player);
 
 var maxPlayers = 2;
 
@@ -70,11 +70,11 @@ Game.prototype.update = function()
 	}
 };
 
-Game.prototype.drawCard = function(clientID, type, x, y)
+Game.prototype.drawCard = function(clientID, value, x, y)
 {
-	var card = new TableCard(clientID, this.tableCardIDCounter, type, x, y);
+	var card = new TableCard(clientID, this.tableCardIDCounter, value, x, y);
 	this.tableCards.push(card);
-	this.server.sendDrawCardToAll(clientID, card.id, card.value, card.x, card,y);
+	this.server.sendDrawCardToAll(clientID, card.id, card.value, card.x, card.y);
 	this.tableCardIDCounter++;
 };
 

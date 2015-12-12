@@ -2,13 +2,13 @@
  * Created by Hamster on 12/3/2015.
  */
 
+exports.TableCard = TableCard;
 
-
-function TableCard(clientID, id, type, x, y)
+function TableCard(clientID, id, value, x, y)
 {
 	this.clientID = clientID;
 	this.id = id;
-	this.type = type;
+	this.value = value;
 	this.x = x;
 	this.y = y;
 	return this;
