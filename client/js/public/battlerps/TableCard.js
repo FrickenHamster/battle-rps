@@ -77,6 +77,13 @@ TableCard.prototype.update = function(mouseX, mouseY)
 			}
 		}
 		
+		var curTime = Date.now();
+		if (curTime > this.lastUpdated + 3000)
+		{
+			this.lastUpdated = curTime;
+			this.game.server.sendUpdateDragCard(this.id, this.x, this.y);
+		}
+		
 	}
 };
 
@@ -151,6 +158,8 @@ TableCard.prototype.onClick = function(mouseX, mouseY)
 		this.selected = false;
 		this.game.unselectCard();
 	}
+	this.lastUpdated = Date.now();
+	this.game.client.sendStartDragCard(this.id);
 };
 
 TableCard.prototype.backToDeck = function()

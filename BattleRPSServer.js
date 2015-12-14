@@ -121,9 +121,8 @@ BattleRPSServer.prototype.startServer = function ()
 							break;
 
 						case pIDs.DRAW_CARD:
-							var xx = Math.floor(Math.random() * 600);
-							var yy = Math.floor(Math.random() * 300);
-							bs.game.drawCard(client.id, data[1], xx, yy);
+							
+							bs.game.drawCard(client.id, data[1]);
 								
 							break;
 					}
@@ -223,6 +222,7 @@ BattleRPSServer.prototype.sendDrawCardToAll = function (clientID, id, value, x, 
 		}
 	}
 };
+
 
 
 serverLog = function (str1)

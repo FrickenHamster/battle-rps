@@ -31,6 +31,9 @@ var Game = function(server){
 	
 	this.tableCards = [];
 	this.tableCardIDCounter = 0;
+
+	this.deckX = 300;
+	this.deckY = 440;
 };
 Game.prototype.addPlayer = function(id, client)
 {
@@ -70,9 +73,11 @@ Game.prototype.update = function()
 	}
 };
 
-Game.prototype.drawCard = function(clientID, value, x, y)
+Game.prototype.drawCard = function(clientID, value)
 {
-	var card = new TableCard(clientID, this.tableCardIDCounter, value, x, y);
+	var xx = this.deckX - 20 + Math.floor(Math.random() * 40);
+	var yy = this.deckY - 20 + Math.floor(Math.random() * 40);
+	var card = new TableCard(clientID, this.tableCardIDCounter, value, xx, yy);
 	this.tableCards.push(card);
 	this.server.sendDrawCardToAll(clientID, card.id, card.value, card.x, card.y);
 	this.tableCardIDCounter++;

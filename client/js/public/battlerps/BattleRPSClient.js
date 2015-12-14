@@ -235,6 +235,33 @@ BattleRPSClient.prototype.sendDrawCard = function(value)
 	dLog("SEND", "DRAW:" + value);
 };
 
+BattleRPSClient.prototype.sendStartDragCard = function(id)
+{
+	if (!this.connected)
+		return;
+	var data = [RPS_PROTOCOL.START_DRAG_CARD, id];
+	this.connection.send(JSON.stringify(data));
+	dLog("SEND", "Start Drag id:" + id);
+};
+
+BattleRPSClient.prototype.sendUpdateDragCard = function(id, x, y)
+{
+	if (!this.connected)
+		return;
+	var data = [RPS_PROTOCOL.UPDATE_DRAG_CARD, id];
+	this.connection.send(JSON.stringify(data));
+	dLog("SEND", "update drag id:");
+};
+
+BattleRPSClient.prototype.sendCompleteDragCard = function(id, x, y)
+{
+	if (!this.connected)
+		return;
+	var data = [RPS_PROTOCOL.COMPLETE_DRAG_CARD, id];
+	this.connection.send(JSON.stringify(data));
+	dLog("SEND", "Complete Drag" + id + " x: " + x + " y: " + y);
+};
+
 function dLog()
 {
 	if (!debugging)
