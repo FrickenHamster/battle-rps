@@ -4,25 +4,23 @@
 
 exports.Player = Player;
 
-function Player(id, client)
+function Player(game, id, client)
 {
+	this.game = game;
 	this.id = id;
 	this.client = client;
 	this.tableCards = [];
 }
 
-Player.prototype.addTableCard = function(x, y)
+Player.prototype.addTableCard = function(card)
 {
-	var card = new TableCard(x, y)
 	
 	this.tableCards.unshift(card);
 };
 
-
-
-function TableCard(x, y)
+Player.prototype.selectTableCard = function(cardID)
 {
-	this.x = x;
-	this.y = y;
-	this.revealed = false;
-}
+	var card = this.game.tableCardIndex[cardID];
+	this.tableCards.splice(this.tableCards.indexOf(card));
+};
+

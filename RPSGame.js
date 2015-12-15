@@ -74,6 +74,13 @@ Game.prototype.update = function()
 	}
 };
 
+Game.prototype.startDragCard = function(clientID, id, x, y)
+{
+	var player = this.players[clientID];
+	if (player === undefined)
+		return;
+};
+
 Game.prototype.updateDragCard = function(id, x, y)
 {
 	var card = this.tableCardIndex[id];
@@ -84,11 +91,21 @@ Game.prototype.updateDragCard = function(id, x, y)
 	console.log(card.x + " , " + card.y);
 };
 
+Game.prototype.completeDragCard = function(id, x, y)
+{
+	
+};
+
+
 Game.prototype.drawCard = function(clientID, value)
 {
+	var player = this.players[clientID];
+	//check player
+	
 	var xx = this.deckX - 20 + Math.floor(Math.random() * 40);
 	var yy = this.deckY - 20 + Math.floor(Math.random() * 40);
 	var card = new TableCard(clientID, this.tableCardIDCounter, value, xx, yy);
+	player.addTableCard(card);
 	this.tableCards.push(card);
 	this.tableCardIndex[card.id] = card;
 	this.server.sendDrawCardToAll(clientID, card.id, card.value, card.x, card.y);

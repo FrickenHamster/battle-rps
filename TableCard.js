@@ -11,5 +11,6 @@ function TableCard(clientID, id, value, x, y)
 	this.value = value;
 	this.x = x;
 	this.y = y;
+	this.revealed = false;
 	return this;
 }
