@@ -248,9 +248,9 @@ BattleRPSClient.prototype.sendUpdateDragCard = function(id, x, y)
 {
 	if (!this.connected)
 		return;
-	var data = [RPS_PROTOCOL.UPDATE_DRAG_CARD, id];
+	var data = [RPS_PROTOCOL.UPDATE_DRAG_CARD, id, x, y];
 	this.connection.send(JSON.stringify(data));
-	dLog("SEND", "update drag id:");
+	dLog("SEND", "update drag id:" + id + " x: " + x + " y: " + y);
 };
 
 BattleRPSClient.prototype.sendCompleteDragCard = function(id, x, y)

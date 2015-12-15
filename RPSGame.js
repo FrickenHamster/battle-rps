@@ -22,7 +22,7 @@ var maxPlayers = 2;
 
 var Game = function(server){
 	this.server = server;
-	this.players ={};
+	this.players = {};
 	this.playerNum = 0;
 	
 	this.turnTimer = 0;
@@ -30,6 +30,7 @@ var Game = function(server){
 	this.stateTimer = 0;
 	
 	this.tableCards = [];
+	this.tableCardIndex = {};
 	this.tableCardIDCounter = 0;
 
 	this.deckX = 300;
@@ -73,12 +74,23 @@ Game.prototype.update = function()
 	}
 };
 
+Game.prototype.updateDragCard = function(id, x, y)
+{
+	var card = this.tableCardIndex[id];
+	if (card === undefined)
+		return;
+	card.x = Math.floor(x);
+	card.y = Math.floor(y);
+	console.log(card.x + " , " + card.y);
+};
+
 Game.prototype.drawCard = function(clientID, value)
 {
 	var xx = this.deckX - 20 + Math.floor(Math.random() * 40);
 	var yy = this.deckY - 20 + Math.floor(Math.random() * 40);
 	var card = new TableCard(clientID, this.tableCardIDCounter, value, xx, yy);
 	this.tableCards.push(card);
+	this.tableCardIndex[card.id] = card;
 	this.server.sendDrawCardToAll(clientID, card.id, card.value, card.x, card.y);
 	this.tableCardIDCounter++;
 };

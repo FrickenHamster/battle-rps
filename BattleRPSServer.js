@@ -125,6 +125,11 @@ BattleRPSServer.prototype.startServer = function ()
 							bs.game.drawCard(client.id, data[1]);
 								
 							break;
+						
+						case pIDs.UPDATE_DRAG_CARD:
+							
+							bs.game.updateDragCard(data[1], data[2], data[3]);
+							break;
 					}
 
 				}
@@ -208,7 +213,6 @@ BattleRPSServer.prototype.sendDrawCardToAll = function (clientID, id, value, x, 
 			if (sendClient.id == clientID)
 			{
 				var selfData = [pIDs.DRAW_CARD, id, value, x, y];
-				console.log(selfData)
 
 				sendClient.connection.send(JSON.stringify(selfData));
 				dLog("SEND", "Self Draw Card to " + sendClient.id + " id: " + id);

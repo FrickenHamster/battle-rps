@@ -45,8 +45,8 @@ TableCard.prototype.update = function(mouseX, mouseY)
 		var dy = mouseY - this.dragYOff;
 		this.x = dx;
 		this.y = dy;
-		this.x = Math.min(Math.max(this.x, 20), this.game.width - 20);
-		this.y = Math.min(Math.max(this.y, 285), this.game.height - 35);
+		this.x = Math.floor(Math.min(Math.max(this.x, 20), this.game.width - 20));
+		this.y = Math.floor(Math.min(Math.max(this.y, 285), this.game.height - 35));
 		this.updateClickPosition(this.x - 20, this.y - 35);
 		this.sprite.position.x = this.x;
 		this.sprite.position.y = this.y;
@@ -78,10 +78,10 @@ TableCard.prototype.update = function(mouseX, mouseY)
 		}
 		
 		var curTime = Date.now();
-		if (curTime > this.lastUpdated + 3000)
+		if (curTime > this.lastUpdated + 300)
 		{
 			this.lastUpdated = curTime;
-			this.game.server.sendUpdateDragCard(this.id, this.x, this.y);
+			this.game.client.sendUpdateDragCard(this.id, this.x, this.y);
 		}
 		
 	}
@@ -135,11 +135,14 @@ TableCard.prototype.completeDrag = function()
 				}
 			}
 		}
-		this.x = Math.min(Math.max(this.x, 20), this.game.width - 20);
-		this.y = Math.min(Math.max(this.y, 285), this.game.height - 35);
+		this.x = Math.floor(Math.min(Math.max(this.x, 20), this.game.width - 20));
+		this.y = Math.floor(Math.min(Math.max(this.y, 285), this.game.height - 35));
 		this.updateClickPosition(this.x - 20, this.y - 35);
 		this.sprite.position.x = this.x;
 		this.sprite.position.y = this.y;
+		
+		this.game.client.sendCompleteDragCard(this.id, this.x, this.y);
+		
 	}
 };
 
