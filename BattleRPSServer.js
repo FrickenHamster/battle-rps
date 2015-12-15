@@ -126,9 +126,17 @@ BattleRPSServer.prototype.startServer = function ()
 								
 							break;
 						
+						case pIDs.START_DRAG_CARD:
+							
+							break;
+						
 						case pIDs.UPDATE_DRAG_CARD:
 							
 							bs.game.updateDragCard(data[1], data[2], data[3]);
+							break;
+						
+						case pIDs.COMPLETE_DRAG_CARD:
+							
 							break;
 					}
 

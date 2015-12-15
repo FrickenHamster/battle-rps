@@ -35,6 +35,8 @@ var Game = function(server){
 
 	this.deckX = 300;
 	this.deckY = 440;
+	this.platformX = 300;
+	this.platformY = 300;
 };
 Game.prototype.addPlayer = function(id, client)
 {
@@ -74,6 +76,13 @@ Game.prototype.update = function()
 	}
 };
 
+Game.prototype.startDragCard = function(clientID, id, x, y)
+{
+	var player = this.players[clientID];
+	if (player === undefined)
+		return;
+};
+
 Game.prototype.updateDragCard = function(id, x, y)
 {
 	var card = this.tableCardIndex[id];
@@ -81,14 +90,51 @@ Game.prototype.updateDragCard = function(id, x, y)
 		return;
 	card.x = Math.floor(x);
 	card.y = Math.floor(y);
-	console.log(card.x + " , " + card.y);
 };
+
+Game.prototype.completeDragCard = function(clientID, id, x, y)
+{
+	
+	var player = this.players[clientID];
+	var card = this.tableCardIndex[id];
+	
+	if (Math.abs(x - this.platformX) < 60 && Math.abs(y - this.platformY) < 80)
+	{
+		if (Math.abs(y - this.platformY) < 30)
+		{
+			if (x > this.platformX)
+			{
+				x = this.platformX + 60;
+			}
+			else
+			{
+				x = this.platformX - 60;
+			}
+		}
+		else
+		{
+			if (y > this.platformY)
+			{
+				y = this.platformY + 80;
+			}
+			else
+			{
+				y = this.platformY - 80;
+			}
+		}
+	}
+};
+
 
 Game.prototype.drawCard = function(clientID, value)
 {
+	var player = this.players[clientID];
+	//check player
+	
 	var xx = this.deckX - 20 + Math.floor(Math.random() * 40);
 	var yy = this.deckY - 20 + Math.floor(Math.random() * 40);
 	var card = new TableCard(clientID, this.tableCardIDCounter, value, xx, yy);
+	player.addTableCard(card);
 	this.tableCards.push(card);
 	this.tableCardIndex[card.id] = card;
 	this.server.sendDrawCardToAll(clientID, card.id, card.value, card.x, card.y);
