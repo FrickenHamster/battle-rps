@@ -128,6 +128,12 @@ Game.prototype.completeDragCard = function(clientID, id, x, y)
 };
 
 
+Game.prototype.completeDragCard = function(id, x, y)
+{
+	
+};
+
+
 Game.prototype.drawCard = function(clientID, value)
 {
 	var player = this.players[clientID];
