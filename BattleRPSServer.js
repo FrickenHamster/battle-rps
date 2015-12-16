@@ -59,7 +59,9 @@ BattleRPSServer.prototype.startServer = function ()
 	{
 		serverLog("connection");
 		var socket = request.accept(null, request.origin);
-
+		
+		socket.binaryType = "arraybuffer";
+		
 		var client =
 		{
 			active: false,
@@ -68,6 +70,15 @@ BattleRPSServer.prototype.startServer = function ()
 
 		socket.on('message', function (message)
 		{
+			//if (message is Array)
+			{
+				//var uint8view = new Uint8Array(message.binaryData);
+				var float64view = new Float64Array(message.data);
+				//console.log(uint8view[0]);
+				console.log(float64view);
+				console.log(message)
+			}
+			return;
 			serverLog("receive message" + message);
 			if (message.type === 'utf8')
 			{

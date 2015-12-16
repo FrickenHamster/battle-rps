@@ -86,6 +86,15 @@ BattleRPSClient.prototype.setupConnection = function(connection)
 		bc.chatInput.val("Connecting");
 		bc.chatInput.prop("disabled", true);
 
+		var ab = new ArrayBuffer(32);
+		var uint8view = new Uint8Array(ab);
+		var float64view = new Float64Array(ab);
+		//uint8view[0] = 6;
+		float64view[1] = 213.223
+		console.log(ab);
+		connection.send(ab);
+		
+		return;
 		bc.sendJoin(bc.tempName);
 
 		/*setInterval(function ()
@@ -204,6 +213,7 @@ BattleRPSClient.prototype.initiateConnect = function(tn)
 	this.tempName = tn;
 
 	var conn = new WebSocket('ws://127.0.0.1:1339');
+	conn.binaryType = "arraybuffer";
 
 	this.addSystemMessage("CONNECTING");
 	this.setupConnection(conn);
