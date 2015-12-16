@@ -97,6 +97,8 @@ Game.prototype.completeDragCard = function(clientID, id, x, y)
 	
 	var player = this.players[clientID];
 	var card = this.tableCardIndex[id];
+	if (player === undefined || card == undefined)
+		return;
 	
 	if (Math.abs(x - this.platformX) < 60 && Math.abs(y - this.platformY) < 80)
 	{
