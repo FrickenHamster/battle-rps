@@ -99,32 +99,44 @@ Game.prototype.completeDragCard = function(clientID, id, x, y)
 	var card = this.tableCardIndex[id];
 	if (player === undefined || card == undefined)
 		return;
-	
-	if (Math.abs(x - this.platformX) < 60 && Math.abs(y - this.platformY) < 80)
+
+	if (Math.abs(x - this.deckX) < 20 && Math.abs(y - this.deckY) < 30)
 	{
-		if (Math.abs(y - this.platformY) < 30)
+		this.backToDeck();
+	}
+	if (player.selectedCard === undefined)
+	{
+		
+	}
+	else
+	{
+		if (Math.abs(x - this.platformX) < 60 && Math.abs(y - this.platformY) < 80)
 		{
-			if (x > this.platformX)
+			if (Math.abs(y - this.platformY) < 30)
 			{
-				x = this.platformX + 60;
+				if (x > this.platformX)
+				{
+					card.x = this.platformX + 60;
+				}
+				else
+				{
+					card.x = this.platformX - 60;
+				}
 			}
 			else
 			{
-				x = this.platformX - 60;
-			}
-		}
-		else
-		{
-			if (y > this.platformY)
-			{
-				y = this.platformY + 80;
-			}
-			else
-			{
-				y = this.platformY - 80;
+				if (y > this.platformY)
+				{
+					card.y = this.platformY + 80;
+				}
+				else
+				{
+					card.y = this.platformY - 80;
+				}
 			}
 		}
 	}
+	
 };
 
 
