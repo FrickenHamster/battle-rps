@@ -88,19 +88,17 @@ BattleRPSClient.prototype.setupConnection = function(connection)
 
 		
 		var ss = "I'm a hamster";
-		var strArrayBuffer = str2ab(ss);
-		var headerArrayBuffer = new ArrayBuffer(1);
-		var headerView = new Uint8Array(headerArrayBuffer);
-		headerView[0] = 32;
-		var finalArrayBuffer = new ArrayBuffer(1 + headerArrayBuffer.length);
-		var finalView = new Uint8Array(finalArrayBuffer);
-		console.log(headerView.length)
-		finalView.set(headerView, 0, 1);
-		finalView.set(strArrayBuffer, 1);
-		
-		
+		var strView = str2ab(ss);
+		var headerView = new Uint8Array(1);
+		headerView[0] = 40;
+		var finalView = new Uint8Array(strView.byteLength + 1);
+		finalView.set(headerView, 0);
+		finalView.set(strView, 1);
 		console.log(finalView);
-		connection.send(strArrayBuffer);
+		var test = new Uint8Array(strView, 1, strView.length - 1);
+		console.log(test);
+		
+		connection.send(finalView);
 		
 		return;
 		bc.sendJoin(bc.tempName);
@@ -304,5 +302,5 @@ function str2ab(str) {
 	for (var i=0, strLen=str.length; i<strLen; i++) {
 		bufView[i] = str.charCodeAt(i);
 	}
-	return buf;
+	return bufView;
 }
