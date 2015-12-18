@@ -86,13 +86,21 @@ BattleRPSClient.prototype.setupConnection = function(connection)
 		bc.chatInput.val("Connecting");
 		bc.chatInput.prop("disabled", true);
 
-		var ab = new ArrayBuffer(32);
-		var uint8view = new Uint8Array(ab);
-		var float64view = new Float64Array(ab);
-		//uint8view[0] = 6;
-		float64view[1] = 213.223
-		console.log(ab);
-		connection.send(ab);
+		
+		var ss = "I'm a hamster";
+		var strArrayBuffer = str2ab(ss);
+		var headerArrayBuffer = new ArrayBuffer(1);
+		var headerView = new Uint8Array(headerArrayBuffer);
+		headerView[0] = 32;
+		var finalArrayBuffer = new ArrayBuffer(1 + headerArrayBuffer.length);
+		var finalView = new Uint8Array(finalArrayBuffer);
+		console.log(headerView.length)
+		finalView.set(headerView, 0, 1);
+		finalView.set(strArrayBuffer, 1);
+		
+		
+		console.log(finalView);
+		connection.send(strArrayBuffer);
 		
 		return;
 		bc.sendJoin(bc.tempName);
@@ -284,4 +292,17 @@ function dLog()
 	{
 		console.log(arguments[0] + " : " + arguments[1])
 	}
+}
+
+function ab2str(buf) {
+	return String.fromCharCode.apply(null, new Uint8Array(buf));
+}
+
+function str2ab(str) {
+	var buf = new ArrayBuffer(str.length); // 2 bytes for each char
+	var bufView = new Uint8Array(buf);
+	for (var i=0, strLen=str.length; i<strLen; i++) {
+		bufView[i] = str.charCodeAt(i);
+	}
+	return buf;
 }

@@ -72,11 +72,12 @@ BattleRPSServer.prototype.startServer = function ()
 		{
 			//if (message is Array)
 			{
-				//var uint8view = new Uint8Array(message.binaryData);
-				var float64view = new Float64Array(message.data);
-				//console.log(uint8view[0]);
-				console.log(float64view);
-				console.log(message)
+				var headerArray = new Uint8Array(message.binaryData, 0, 1);
+				var strArray = new Uint16Array(message.binaryData, 1);
+				var hh = headerArray[0];
+				var ss = ab2str(strArray);
+				console.log(hh[0]);
+				console.log(ss);
 			}
 			return;
 			serverLog("receive message" + message);
@@ -275,3 +276,15 @@ function stringCleaner(str)
 		.replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
+function ab2str(buf) {
+	return String.fromCharCode.apply(null, new Uint16Array(buf));
+}
+
+function str2ab(str) {
+	var buf = new ArrayBuffer(str.length); // 2 bytes for each char
+	var bufView = new Uint8Array(buf);
+	for (var i=0, strLen=str.length; i<strLen; i++) {
+		bufView[i] = str.charCodeAt(i);
+	}
+	return buf;
+}
