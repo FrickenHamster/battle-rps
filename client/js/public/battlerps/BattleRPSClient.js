@@ -87,20 +87,6 @@ BattleRPSClient.prototype.setupConnection = function(connection)
 		bc.chatInput.prop("disabled", true);
 
 		
-		var ss = "I'm a hamster";
-		var strView = str2ab(ss);
-		var headerView = new Uint8Array(1);
-		headerView[0] = 40;
-		var finalView = new Uint8Array(strView.byteLength + 1);
-		finalView.set(headerView, 0);
-		finalView.set(strView, 1);
-		console.log(finalView);
-		var test = new Uint8Array(strView, 1, strView.length - 1);
-		console.log(test);
-		
-		connection.send(finalView);
-		
-		return;
 		bc.sendJoin(bc.tempName);
 
 		/*setInterval(function ()
@@ -119,25 +105,26 @@ BattleRPSClient.prototype.setupConnection = function(connection)
 		bc.addChatError("Connection error");
 	};
 
-	connection.onmessage = function (message)
+	connection.onmessage = function (rawData)
 	{
-		try
+		console.log(rawData);
+		/*if (rawData.type != "binary")
 		{
-			var data = JSON.parse(message.data);
-		} catch (e)
-		{
-			console.log('Invalid message received form server', message.data);
+			dLog("Invalid message");
 			return;
-		}
-		dLog("received message" + data);
-
-		switch (data[0])
+		}*/
+		dLog("received message size: " + rawData.data.byteLength);
+		var data = new Uint8Array(rawData.data);
+		var protoID = data[0];
+		dLog("protocol: " + protoID);
+		switch (protoID)
 		{
 			case RPS_PROTOCOL.NEW_USER:
 				console.log("received id" + data[1]);
 				var newID = data[1];
-				var newName = data[2];
-				bc.gameClient.addPlayer(data[1], data[2]);
+				var nameView = data.slice(2, data.length);
+				var newName = ab2str(nameView);
+				bc.gameClient.addPlayer(newID, newName);
 				var newClient = {
 					id:newID,
 					name:newName
@@ -159,11 +146,13 @@ BattleRPSClient.prototype.setupConnection = function(connection)
 				break;
 
 			case RPS_PROTOCOL.SEND_USERS:
+				var byteOffset = 1;
 				for (var i = 1; i < data.length; i += 2)
 				{
+					var nameLength = data[byteOffset + 1];
 					bc.clients[data[i]] =
 					{
-						id: data[i],
+						id: data[byteOffset],
 						name: data[i + 1]
 					};
 					console.log(bc.clients[data[i]]);
@@ -179,7 +168,10 @@ BattleRPSClient.prototype.setupConnection = function(connection)
 			case RPS_PROTOCOL.CHAT_MESSAGE:
 				var msgID = data[1];
 				var msgClient = bc.clients[msgID];
-				bc.addChatMessage(msgClient.name,  data[2]);
+				var msgView = data.slice(2);
+				console.log("mv" + msgView);
+				var msg = ab2str(msgView);
+				bc.addChatMessage(msgClient.name, msg);
 
 				break;
 			
@@ -228,8 +220,14 @@ BattleRPSClient.prototype.initiateConnect = function(tn)
 
 BattleRPSClient.prototype.sendJoin = function(userName)
 {
-	var data = [RPS_PROTOCOL.INIT_JOIN, userName];
-	this.connection.send(JSON.stringify(data));
+	var protoView = new Uint8Array(1);
+	protoView[0] = RPS_PROTOCOL.INIT_JOIN;
+	
+	var userNameView = str2ab(userName);
+	var sendArray = new Uint8Array(userNameView.byteLength + 1);
+	sendArray.set(protoView);
+	sendArray.set(userNameView, 1);
+	this.connection.send(sendArray);
 	dLog("SEND", "JOIN");
 };
 
@@ -237,8 +235,14 @@ BattleRPSClient.prototype.sendMessage = function(message)
 {
 	if (!this.connected)
 		return;
-	var data = [RPS_PROTOCOL.CHAT_MESSAGE, message];
-	this.connection.send(JSON.stringify(data));
+	var protoView = new Uint8Array(1);
+	protoView[0] = RPS_PROTOCOL.CHAT_MESSAGE;
+
+	var messageView = str2ab(message);
+	var sendArray = new Uint8Array(messageView.byteLength + 1);
+	sendArray.set(protoView);
+	sendArray.set(messageView, 1);
+	this.connection.send(sendArray);
 	dLog("SEND", "CHAT" + message);
 };
 

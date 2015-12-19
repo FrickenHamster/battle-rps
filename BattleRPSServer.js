@@ -28,7 +28,7 @@ function BattleRPSServer()
 	this.freeIDs = [];
 
 	this.clients = {};
-
+	
 }
 
 
@@ -68,38 +68,32 @@ BattleRPSServer.prototype.startServer = function ()
 			name: null
 		};
 
-		socket.on('message', function (message)
+		socket.on('message', function (rawData)
 		{
 			//if (message is Array)
+
+			if (rawData.type === 'binary')
 			{
-				var headerArray = new Uint8Array(message.binaryData, 0, 1);
-				var aa = new Uint8Array(message.binaryData, 1, 5);
-				console.log(aa);
-				var strArray = aa.slice(1, aa.length - 1);
-				var ss = ab2str(strArray);
-				var hh = headerArray[0];
-				console.log(aa.length, aa.byteOffset);
+				serverLog("receive binary message size" + rawData.binaryData.byteLength);
+				var data = new Uint8Array(rawData.binaryData);
+				var protoID = data[0];
+				serverLog("message Protocol ID: " + protoID);
 				
-			}
-			return;
-			serverLog("receive message" + message);
-			if (message.type === 'utf8')
-			{
-				var data = JSON.parse(message.utf8Data);
-				serverLog("receive message " + data);
-				//check length
-				var id = data[0];
 				if (!client.active)
 				{
-					if (id == pIDs.INIT_JOIN)
+					if (protoID == pIDs.INIT_JOIN)
 					{
+						var userNameView = data.slice(1, data.length);
+						var userName = ab2str(userNameView);
+						var test = new Uint8Array(data, 1, 4);
+						console.log(test.length)
 						if (freeIDs.size == 0)
 						{
 							//reject
 						}
 						var newID = freeIDs.pop();
 						client.active = true;
-						client.name = data[1];
+						client.name = userName;
 						client.id = newID;
 						client.connection = socket;
 						bs.game.addPlayer(newID, client);
@@ -116,44 +110,41 @@ BattleRPSServer.prototype.startServer = function ()
 
 						bs.sendUsers(client);
 					}
-
 				}
-				else
+				else switch(protoID)
 				{
-					switch (id)
-					{
-						case pIDs.CHAT_MESSAGE:
-							var message = stringCleaner(data[1]);
-							for (i in clients)
+					case pIDs.CHAT_MESSAGE:
+						var rawMessage = data.slice(1, data.length);
+						var message = stringCleaner(ab2str(rawMessage));
+						serverLog(message);
+						for (i in clients)
+						{
+							sendClient = clients[i];
+							if (sendClient.active)
 							{
-								sendClient = clients[i];
-								if (sendClient.active)
-								{
-									bs.sendChatMessage(sendClient, client.id, message);
-								}
+								bs.sendChatMessage(sendClient, client.id, message);
 							}
-							break;
+						}
+						break;
 
-						case pIDs.DRAW_CARD:
-							
-							bs.game.drawCard(client.id, data[1]);
-								
-							break;
-						
-						case pIDs.START_DRAG_CARD:
-							
-							break;
-						
-						case pIDs.UPDATE_DRAG_CARD:
-							
-							bs.game.updateDragCard(data[1], data[2], data[3]);
-							break;
-						
-						case pIDs.COMPLETE_DRAG_CARD:
-							
-							break;
-					}
+					case pIDs.DRAW_CARD:
 
+						bs.game.drawCard(client.id, data[1]);
+
+						break;
+
+					case pIDs.START_DRAG_CARD:
+
+						break;
+
+					case pIDs.UPDATE_DRAG_CARD:
+
+						bs.game.updateDragCard(data[1], data[2], data[3]);
+						break;
+
+					case pIDs.COMPLETE_DRAG_CARD:
+
+						break;
 				}
 			}
 		});
@@ -183,37 +174,76 @@ rpsServer.startServer();
 
 BattleRPSServer.prototype.sendAssignID = function (sendClient, id)
 {
-	var data = [pIDs.ASSIGN_ID, id];
-	sendClient.connection.send(JSON.stringify(data));
+	var buffer = new Buffer(2);
+	buffer[0] = pIDs.ASSIGN_ID;
+	buffer[1] = id;
+	
+	sendClient.connection.sendBytes(buffer);
 	dLog("SEND", "assign id : " + id);
 };
 
 BattleRPSServer.prototype.sendChatMessage = function (sendClient, fromClient, message)
 {
-	var data = [pIDs.CHAT_MESSAGE, fromClient, message];
-	sendClient.connection.send(JSON.stringify(data));
+	var buffer = new Buffer(message.length + 2);
+	buffer[0] = pIDs.CHAT_MESSAGE;
+	buffer[1] = fromClient.id;
+	copyStringToBuffer(buffer, message, 2);
+	sendClient.connection.sendBytes(buffer);
+	console.log(buffer.size);
 	dLog("send chat message to " + sendClient.id + ":" + message);
 };
 
 BattleRPSServer.prototype.sendNewClient = function (sendClient, id, name)
 {
-	var data = [pIDs.NEW_USER, id, name];
-	sendClient.connection.send(JSON.stringify(data));
+	var protoView = new Uint8Array(1);
+	protoView[0] = pIDs.NEW_USER;
+
+	var nameView = str2ab(name);
+
+	var sendArray = new Uint8Array(messageView + 1);
+	sendArray.set(protoView);
+	sendArray.set(nameView);
+	sendClient.connection.send(sendArray);
 	dLog("SEND", "New Client to " + sendClient.id + " new client : " + id);
 };
 
 BattleRPSServer.prototype.sendUsers = function (sendClient)
 {
-	var data = [pIDs.SEND_USERS];
+	var sendSize = 1;
+	
+	var nameBuffers = [];
 	for (var i in clients)
 	{
 		var client = clients[i];
-
 		if (!client.active)
 			continue;
-		data.push(i, client.name);
+		var ss = client.name.length;
+		/*var nameView = str2ab(client.name);
+		
+		var ss = nameView.byteLength;
+		
+		var nameChunk = new Uint8Array(ss + 1);
+		nameChunk[0] = client.id;
+		nameChunk.set(nameView, 1);
+		nameBuffers.push(nameChunk);*/
+		sendSize += ss + 2;
 	}
-	sendClient.connection.send(JSON.stringify(data));
+	var buffer = new Buffer(sendSize);
+	buffer[0] = pIDs.SEND_USERS;
+	var bytePos = 1;
+
+	for (var i in clients)
+	{
+		var client = clients[i];
+		if (!client.active)
+			continue;
+		buffer[bytePos] = client.id;
+		buffer[bytePos + 1] = client.name.length;
+		copyStringToBuffer(buffer, client.name, bytePos + 1);
+		bytePos += 2 + client.name;
+	}
+	
+	sendClient.connection.send(buffer);
 	dLog("SEND", "Users to " + sendClient.id);
 };
 
@@ -280,12 +310,6 @@ function stringCleaner(str)
 
 function ab2str(buf)
 {
-	var ss = "";
-	for (var i = 0; i < buf.length; i++)
-	{
-		ss += String.fromCharCode(buf[i]);
-	}
-	return ss;
 	return String.fromCharCode.apply(null, new Uint8Array(buf));
 }
 
@@ -296,4 +320,20 @@ function str2ab(str) {
 		bufView[i] = str.charCodeAt(i);
 	}
 	return buf;
+}
+
+function copyStringToBuffer(buffer, string, offset)
+{
+	for (var i = 0; i < string.length; i++)
+	{
+		buffer[offset + i] = string.charCodeAt(i);
+	}
+}
+
+function copyArrayToBuffer(buffer, array, offset)
+{
+	for (var i = 0; i < array.length; i++)
+	{
+		buffer[offset + i] = array[i];
+	}
 }
