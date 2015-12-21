@@ -14,3 +14,13 @@ function TableCard(clientID, id, value, x, y)
 	this.revealed = false;
 	return this;
 }
+
+TableCard.prototype.backToDeck = function()
+{
+	
+};
+
+TableCard.prototype.die = function()
+{
+	
+};

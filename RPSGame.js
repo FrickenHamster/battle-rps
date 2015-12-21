@@ -76,37 +76,51 @@ Game.prototype.update = function()
 	}
 };
 
-Game.prototype.startDragCard = function(clientID, id, x, y)
+Game.prototype.startDragCard = function(clientID, cardID)
 {
 	var player = this.players[clientID];
 	if (player === undefined)
 		return;
+	var card = this.tableCardIndex[cardID];
+	if (card === undefined)
+		return;
+	player.startDragTableCard(card);
+	this.server.sendStartDragCardToAll(clientID, cardID);
 };
 
-Game.prototype.updateDragCard = function(id, x, y)
+Game.prototype.updateDragCard = function(clientID, cardID, x, y)
 {
-	var card = this.tableCardIndex[id];
+	var card = this.tableCardIndex[cardID];
 	if (card === undefined)
 		return;
 	card.x = Math.floor(x);
 	card.y = Math.floor(y);
+	console.log("card:" + x + "," + y);
+	this.server.sendUpdateDragCardToAll(clientID, cardID, x, y);
 };
 
-Game.prototype.completeDragCard = function(clientID, id, x, y)
+Game.prototype.completeDragCard = function(clientID, cardID, x, y)
 {
-	
 	var player = this.players[clientID];
-	var card = this.tableCardIndex[id];
+	var card = this.tableCardIndex[cardID];
 	if (player === undefined || card == undefined)
 		return;
 
 	if (Math.abs(x - this.deckX) < 20 && Math.abs(y - this.deckY) < 30)
 	{
-		this.backToDeck();
+		card.backToDeck();
 	}
 	if (player.selectedCard === undefined)
 	{
-		
+		if (Math.abs(this.x - this.platformX) < 40 && Math.abs(this.y - this.platformY) < 50)
+		{
+			this.x = this.platformX;
+			this.y = this.platformY;
+
+			player.selectTableCard(this);
+			card.selected = true;
+			player.tableCards.splice(player.tableCards.indexOf(card));
+		}
 	}
 	else
 	{
@@ -136,14 +150,9 @@ Game.prototype.completeDragCard = function(clientID, id, x, y)
 			}
 		}
 	}
-	
-};
 
-
-Game.prototype.completeDragCard = function(id, x, y)
-{
-	
-};
+	this.server.sendCompleteDragCardToAll(clientID, cardID, card.x, card.y);
+}
 
 
 Game.prototype.drawCard = function(clientID, value)

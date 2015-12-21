@@ -99,7 +99,7 @@ BattleRPSGame.prototype.startMatch = function()
 	this.tableLine.lineTo(this.width, this.height / 2);
 	
 	this.tableLayer.addChild(this.tableLine);
-
+	
 	this.deckX = 300;
 	this.deckY = 440;
 	this.deckSprite = new PIXI.Sprite(PIXI.loader.resources['saltCardBack'].texture);
@@ -180,32 +180,54 @@ BattleRPSGame.prototype.addPlayer = function (id, name)
 	this.players[id] = player;
 };
 
-BattleRPSGame.prototype.addTableCard = function(id, type, x, y)
+BattleRPSGame.prototype.addTableCard = function(cardID, type, x, y)
 {
-	if (this.tableCards[id] !== undefined)
+	if (this.tableCards[cardID] !== undefined)
 		return undefined;
 	if (this.tableCardPool.length == 0)
 		return undefined;
 	var card = this.tableCardPool.pop();
-	card.spawn(id, type, x, y);
-	this.tableCards[id] = card;
+	card.spawn(cardID, type, x, y);
+	this.tableCards[cardID] = card;
 	this.activeTableCards.unshift(card);
 	
 	return card;
 };
 
-BattleRPSGame.prototype.addEnemyTableCard = function(id, x, y)
+BattleRPSGame.prototype.addEnemyTableCard = function(clientID, cardID, x, y)
 {
-	if (this.enemyTableCards[id] !== undefined)
+	if (this.enemyTableCards[cardID] !== undefined)
 		return undefined;
 	if (this.enemyTableCardPool.length == 0)
 		return undefined;
 	var card = this.enemyTableCardPool.pop();
-	card.spawn(id, x, y);
-	this.enemyTableCards[id] = card;
+	card.spawn(clientID, cardID, x, y);
+	this.enemyTableCards[cardID] = card;
 	this.activeEnemyTableCards.unshift(card);
 
 	return card;
+};
+
+BattleRPSGame.prototype.startDragEnemyTableCard = function(clientID, cardID)
+{
+	var card = this.enemyTableCards[cardID];
+	if (card === undefined)
+		return;
+	card.startDrag();
+};
+BattleRPSGame.prototype.updateDragEnemyTableCard = function(clientID, cardID, x, y)
+{
+	var card = this.enemyTableCards[cardID];
+	if (card === undefined)
+		return;
+	card.setDragTarget(x, y);
+};
+BattleRPSGame.prototype.completeDragEnemyTableCard = function(clientID, cardID, x, y)
+{
+	var card = this.enemyTableCards[cardID];
+	if (card === undefined)
+		return;
+	card.stopDrag(x, y);
 };
 
 BattleRPSGame.prototype.selectCard = function(card)
@@ -238,21 +260,31 @@ BattleRPSGame.prototype.getFreeTableCardID = function()
 
 BattleRPSGame.prototype.drawLoop = function()
 {
-	var gx = game.renderer.plugins.interaction.mouse.global.x;
-	var gy = game.renderer.plugins.interaction.mouse.global.y;
-	if (gx >= 0 && gx <= game.width && gy >= 0 && gy <= game.height)
+	var gx = this.renderer.plugins.interaction.mouse.global.x;
+	var gy = this.renderer.plugins.interaction.mouse.global.y;
+	if (gx >= 0 && gx <= this.width && gy >= 0 && gy <= this.height)
 	{
-		game.gameMouseX = gx;
-		game.gameMouseY = gy;
+		this.gameMouseX = gx;
+		this.gameMouseY = gy;
 	}
-	for (var i in game.activeTableCards)
+	
+	var i;
+	for (i in this.activeTableCards)
 	{
-		var tableCard = game.activeTableCards[i];
-		tableCard.update(game.gameMouseX, game.gameMouseY);
+		var tableCard = this.activeTableCards[i];
+		tableCard.update(this.gameMouseX, this.gameMouseY);
+	}
+	for (i in this.activeEnemyTableCards)
+	{
+		var enemyTableCard = this.activeEnemyTableCards[i];
+		enemyTableCard.update();
 	}
 	
 	game.renderer.render(game.stage);
-	requestAnimationFrame(game.drawLoop);
+	requestAnimationFrame(function ()
+	{
+		game.drawLoop();
+	});
 	
 };
 

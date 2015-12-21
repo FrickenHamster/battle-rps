@@ -35,6 +35,7 @@ TableCard.prototype.spawn = function(id, cardValue, x, y)
 	
 	this.dragging = false;
 	this.selected = false;
+	
 };
 
 TableCard.prototype.update = function(mouseX, mouseY)
@@ -78,7 +79,7 @@ TableCard.prototype.update = function(mouseX, mouseY)
 		}
 		
 		var curTime = Date.now();
-		if (curTime > this.lastUpdated + 300)
+		if (curTime > this.lastUpdated + 30)
 		{
 			this.lastUpdated = curTime;
 			this.game.client.sendUpdateDragCard(this.id, this.x, this.y);

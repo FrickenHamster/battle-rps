@@ -10,7 +10,7 @@ function Player(game, id, client)
 	this.id = id;
 	this.client = client;
 	this.tableCards = [];
-};
+}
 
 Player.prototype.addTableCard = function(card)
 {
@@ -22,6 +22,7 @@ Player.prototype.startDragTableCard = function(card)
 	this.draggingCard = card;
 	this.tableCards.splice(this.tableCards.indexOf(card));
 	this.tableCards.unshift(card);
+	serverLog("start dragging " + card.id);
 };
 
 Player.prototype.stopDragTableCard = function()
@@ -38,6 +39,12 @@ Player.prototype.selectTableCard = function(card)
 
 Player.prototype.unselectTableCard = function(card)
 {
-	
-}
+	this.selectedCard = undefined;
+};
 
+serverLog = function (str1)
+{
+	var date = new Date();
+	var dtext = date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+	console.log(dtext + " PLAYER-" + str1);
+};
