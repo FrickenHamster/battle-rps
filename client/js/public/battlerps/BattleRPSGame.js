@@ -77,8 +77,9 @@ BattleRPSGame.prototype.startMatch = function()
 	});
 	
 	this.stage.interactive = true;
-	
+	this.tableBottomLayer = new PIXI.Container();
 	this.tableLayer = new PIXI.Container();
+	this.stage.addChild(this.tableBottomLayer);
 	this.stage.addChild(this.tableLayer);
 	this.platformX = 300;
 	this.platformY = 300;
@@ -87,11 +88,16 @@ BattleRPSGame.prototype.startMatch = function()
 	this.playerCardPlatform.anchor.y = 0.5;
 	this.playerCardPlatform.position.x = 300;
 	this.playerCardPlatform.position.y = 300;
-	this.tableLayer.addChild(this.playerCardPlatform);
+	this.tableBottomLayer.addChild(this.playerCardPlatform);
 	this.tableCardLayer = new PIXI.Container();
 	this.stage.addChild(this.tableCardLayer);
-	
-	
+	this.enemyCardPlatform = new PIXI.Sprite(PIXI.loader.resources['cardPlatform'].texture);
+	this.enemyCardPlatform.anchor.x = 0.5;
+	this.enemyCardPlatform.anchor.y = 0.5;
+	this.enemyCardPlatform.rotation = Math.PI;
+	this.enemyCardPlatform.x = this.width - this.platformX;
+	this.enemyCardPlatform.y = this.height - this.platformY;
+	this.tableBottomLayer.addChild(this.enemyCardPlatform);
 	
 	this.tableLine = new PIXI.Graphics();
 	this.tableLine.lineStyle(2, 0x000000, 1);
@@ -192,6 +198,14 @@ BattleRPSGame.prototype.addTableCard = function(cardID, type, x, y)
 	this.activeTableCards.unshift(card);
 	
 	return card;
+};
+
+BattleRPSGame.prototype.completeDragTableCard = function(cardID, x, y)
+{
+	var card = this.tableCards[cardID];
+	if (card === undefined)
+		return undefined;
+	card.changePosition(x, y);
 };
 
 BattleRPSGame.prototype.addEnemyTableCard = function(clientID, cardID, x, y)

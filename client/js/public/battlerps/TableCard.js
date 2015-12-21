@@ -90,6 +90,12 @@ TableCard.prototype.update = function(mouseX, mouseY)
 
 TableCard.prototype.completeDrag = function()
 {
+	var endX = this.x;
+	var endY = this.y;
+	var xx;
+	var yy;
+	
+	this.sprite.tint = 0xffffff;
 	if (Math.abs(this.x - this.game.deckX) < 20 && Math.abs(this.y - this.game.deckY) < 30)
 	{
 		this.backToDeck();
@@ -101,8 +107,8 @@ TableCard.prototype.completeDrag = function()
 		{
 			if (Math.abs(this.x - this.game.platformX) < 40 && Math.abs(this.y - this.game.platformY) < 50)
 			{
-				this.x = this.game.platformX;
-				this.y = this.game.platformY;
+				xx = this.game.platformX;
+				yy = this.game.platformY;
 
 				this.game.selectCard(this);
 				this.selected = true;
@@ -116,35 +122,40 @@ TableCard.prototype.completeDrag = function()
 				{
 					if (this.x > this.game.platformX)
 					{
-						this.x = this.game.platformX + 60;
+						xx = this.game.platformX + 60;
 					}
 					else
 					{
-						this.x = this.game.platformX - 60;
+						xx = this.game.platformX - 60;
 					}
 				}
 				else
 				{
 					if (this.y > this.game.platformY)
 					{
-						this.y = this.game.platformY + 80;
+						yy = this.game.platformY + 80;
 					}
 					else
 					{
-						this.y = this.game.platformY - 80;
+						yy = this.game.platformY - 80;
 					}
 				}
 			}
 		}
-		this.x = Math.floor(Math.min(Math.max(this.x, 20), this.game.width - 20));
-		this.y = Math.floor(Math.min(Math.max(this.y, 285), this.game.height - 35));
-		this.updateClickPosition(this.x - 20, this.y - 35);
-		this.sprite.position.x = this.x;
-		this.sprite.position.y = this.y;
-		
-		this.game.client.sendCompleteDragCard(this.id, this.x, this.y);
-		
+		xx = Math.floor(Math.min(Math.max(xx, 20), this.game.width - 20));
+		yy = Math.floor(Math.min(Math.max(yy, 285), this.game.height - 35));
+		this.changePosition(xx, yy);
+		this.game.client.sendCompleteDragCard(this.id, endX, endY);
 	}
+};
+
+TableCard.prototype.changePosition = function(x, y)
+{
+	this.x = x;
+	this.y = y;
+	this.updateClickPosition(this.x - 20, this.y - 35);
+	this.sprite.position.x = this.x;
+	this.sprite.position.y = this.y;
 };
 
 TableCard.prototype.onClick = function(mouseX, mouseY)

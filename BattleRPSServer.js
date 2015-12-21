@@ -19,9 +19,7 @@ function BattleRPSServer()
 	this.maxPlayers = 2;
 	this.maxClients = 10;
 	this.freeIDs = [];
-
 	this.clients = {};
-	
 }
 
 
@@ -132,7 +130,6 @@ BattleRPSServer.prototype.startServer = function ()
 							break;
 
 						case pIDs.START_DRAG_CARD:
-							console.log(dataView.byteLength);
 							cardID = dataView.getUint8(1);
 							bs.game.startDragCard(client.id, cardID);
 							break;
@@ -148,7 +145,7 @@ BattleRPSServer.prototype.startServer = function ()
 							cardID = dataView.getUint8(1);
 							xx = dataView.getUint16(2);
 							yy = dataView.getUint16(4);
-							bs.game.completeDragCard(cardID, xx, yy);
+							bs.game.completeDragCard(client.id, cardID, xx, yy);
 							break;
 					}
 				}
@@ -392,12 +389,11 @@ BattleRPSServer.prototype.sendCompleteDragCardToAll = function (clientID, cardID
 				var selfDataView = new DataView(selfArrayBuffer);
 				selfDataView.setUint8(0, pIDs.COMPLETE_DRAG_CARD);
 				selfDataView.setUint8(1, cardID);
-				dataView.setUint16(2, x);
-				dataView.setUint16(4, y);
+				selfDataView.setUint16(2, x);
+				selfDataView.setUint16(4, y);
 				copyArrayToBuffer(selfBuffer, selfDataView);
-
 				sendClient.connection.sendBytes(selfBuffer);
-				dLog("SEND", "Self Complete Draw Card to " + sendClient.id + " id: " + cardID);
+				dLog("SEND", "Self Complete drag Card to " + sendClient.id + " id: " + cardID);
 			}
 			else
 			{

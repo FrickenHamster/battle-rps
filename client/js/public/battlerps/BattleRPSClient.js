@@ -2,7 +2,7 @@
  * Created by Hamster on 7/13/2015.
  */
 "use strict";
-var debugging = false;
+var debugging = true;
 function BattleRPSClient()
 {
 
@@ -183,6 +183,14 @@ BattleRPSClient.prototype.setupConnection = function(connection)
 				bc.gameClient.addTableCard(cardID, cardValue, xx, yy);
 				
 				break;
+
+			case RPS_PROTOCOL.COMPLETE_DRAG_CARD:
+				cardID = data[1];
+				xx = dataView.getUint16(2);
+				yy = dataView.getUint16(4);
+				console.log(xx, yy);
+				bc.gameClient.completeDragTableCard(cardID, xx, yy);
+				break;
 			
 			case RPS_PROTOCOL.ENEMY_DRAW_CARD:
 				clientID = data[1];
@@ -211,6 +219,7 @@ BattleRPSClient.prototype.setupConnection = function(connection)
 				cardID = data[2];
 				xx = dataView.getUint16(3);
 				yy = dataView.getUint16(5);
+				console.log(xx, yy);
 				bc.gameClient.completeDragEnemyTableCard(clientID, cardID, xx, yy);
 				break;
 				

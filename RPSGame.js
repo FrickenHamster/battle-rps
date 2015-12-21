@@ -95,7 +95,6 @@ Game.prototype.updateDragCard = function(clientID, cardID, x, y)
 		return;
 	card.x = Math.floor(x);
 	card.y = Math.floor(y);
-	console.log("card:" + x + "," + y);
 	this.server.sendUpdateDragCardToAll(clientID, cardID, x, y);
 };
 
@@ -103,7 +102,7 @@ Game.prototype.completeDragCard = function(clientID, cardID, x, y)
 {
 	var player = this.players[clientID];
 	var card = this.tableCardIndex[cardID];
-	if (player === undefined || card == undefined)
+	if (player === undefined || card === undefined)
 		return;
 
 	if (Math.abs(x - this.deckX) < 20 && Math.abs(y - this.deckY) < 30)
@@ -112,14 +111,15 @@ Game.prototype.completeDragCard = function(clientID, cardID, x, y)
 	}
 	if (player.selectedCard === undefined)
 	{
-		if (Math.abs(this.x - this.platformX) < 40 && Math.abs(this.y - this.platformY) < 50)
+		if (Math.abs(x - this.platformX) < 40 && Math.abs(y - this.platformY) < 50)
 		{
-			this.x = this.platformX;
-			this.y = this.platformY;
+			card.x = this.platformX;
+			card.y = this.platformY;
 
-			player.selectTableCard(this);
+			player.selectTableCard(card);
 			card.selected = true;
 			player.tableCards.splice(player.tableCards.indexOf(card));
+			console.log("test");
 		}
 	}
 	else
@@ -150,9 +150,8 @@ Game.prototype.completeDragCard = function(clientID, cardID, x, y)
 			}
 		}
 	}
-
 	this.server.sendCompleteDragCardToAll(clientID, cardID, card.x, card.y);
-}
+};
 
 
 Game.prototype.drawCard = function(clientID, value)

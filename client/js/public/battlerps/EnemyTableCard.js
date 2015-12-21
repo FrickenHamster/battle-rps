@@ -107,6 +107,8 @@ EnemyTableCard.prototype.stopDrag = function(tarx, tary)
 {
 	this.targetX = tarx;
 	this.targetY = tary;
+	var dist = Math.sqrt(Math.pow(this.targetX - this.x, 2) + Math.pow(this.targetY - this.y, 2));
+	this.targetSpeed = dist / 3;
 	this.state = TABLE_CARD_STATES.FINISHING;
 };
 

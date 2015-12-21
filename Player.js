@@ -22,6 +22,10 @@ Player.prototype.startDragTableCard = function(card)
 	this.draggingCard = card;
 	this.tableCards.splice(this.tableCards.indexOf(card));
 	this.tableCards.unshift(card);
+	if (this.selectedCard == card)
+	{
+		this.unselectTableCard();
+	}
 	serverLog("start dragging " + card.id);
 };
 
@@ -37,7 +41,7 @@ Player.prototype.selectTableCard = function(card)
 	this.selectedCard = card;
 };
 
-Player.prototype.unselectTableCard = function(card)
+Player.prototype.unselectTableCard = function()
 {
 	this.selectedCard = undefined;
 };
